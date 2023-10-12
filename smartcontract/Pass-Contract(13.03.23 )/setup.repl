@@ -1,0 +1,351 @@
+(begin-tx)
+
+(define-namespace "free" (sig-keyset) (sig-keyset))
+(define-namespace "marmalade" (sig-keyset) (sig-keyset))
+(define-namespace "kryptomerch" (sig-keyset) (sig-keyset))
+(define-namespace "kip" (sig-keyset) (sig-keyset))
+(define-namespace "util" (sig-keyset) (sig-keyset))
+(define-namespace "pass" (sig-keyset) (sig-keyset))
+
+(env-keys ["mar" "merch" "coin" "pass"])
+(env-data {
+  "marmalade-admin":{"keys":["mar"],"pred":"keys-all"},
+  "kryptomerch-dbcooper-ks":{"keys":["merch"],"pred":"keys-all"},
+  "coin-guard":{"keys":["merch"],"pred":"keys-all"},
+  "demotest-ks-1":{"keys":["merch"],"pred":"keys-all"},
+  "demotestpolicy-ks-1":{"keys":["merch"],"pred":"keys-all"}
+  })
+
+(load "kip.token-manifest.pact")
+(load "fungible-xchain-v1.pact")
+(load "fungible-v2.pact")
+(load "coin.pact")
+(load "kip.token-policy-v1.pact")
+(load "kip.poly-fungible-v2.pact")
+(load "kip.account-protocols-v1.pact")
+(load "util.fungible-util.pact")
+(load "util.guards.pact")
+(load "marmalade.ledger.pact")
+; (load "dbcoppercontract.pact")
+(load "pass3.pact")
+(load "pass-policy3.pact")
+(load "demomarketplace.pact")
+
+(commit-tx)
+
+
+(begin-tx)
+
+(use pass.testdemo1)
+(use kip.token-manifest)
+(use pass.testdemo1policy)
+
+; (use pass.testdemo1policy)
+
+(env-data
+{
+  "user":"user",
+  "user2":"user2",
+"creator":"creator",
+'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+'user-ks: {"keys": ["user"], "pred": "keys-all"},
+'user2-ks: {"keys": ["user2"], "pred": "keys-all"},
+'token: {
+    'id: "",
+    'manifest: (create-manifest (uri "text" "") []),
+    'precision: 0,
+    'supply: 1.0
+    }
+
+}
+
+
+  )
+
+(expect "create creator account " "Write succeeded"
+(pass.coin.create-account "creator" (read-keyset 'creator-guard) ))
+
+(expect "create user account " "Write succeeded"
+(pass.coin.create-account "user" (read-keyset 'user-ks) ))
+
+ (test-capability (pass.coin.COINBASE))
+
+ (expect "coinbase buyer" "Write succeeded"
+ (pass.coin.coinbase "user" (read-keyset 'user-ks) 100.0))
+
+ (expect "create user account " "Write succeeded"
+ (pass.coin.create-account "user2" (read-keyset 'user2-ks) ))
+
+  (test-capability (pass.coin.COINBASE))
+
+  (expect "coinbase buyer" "Write succeeded"
+  (pass.coin.coinbase "user2" (read-keyset 'user2-ks) 100.0))
+
+
+
+(test-capability (pass.testdemo1.CREATE-COLLECTION "pass" "pass"))
+(create-collection
+  "pass"
+  "pass"
+  2
+  pass.testdemo1policy
+  (read-keyset "creator-guard")
+  "creator"
+  (read-msg "token")
+  ; [
+  ;     "6f74d22f157c11c730931b23fbb8725b21eb551d8571d7c5a190d29594db9c2d",
+  ;     "6f8546129463a42dba32bdd9c18b47d5f6139b6e3570a94346916439be0bacad",
+  ;     "f18167020167da2dc0393b1506a8a17b676115bfbc3e303ebc26843cbfa1d496",
+  ;     "a45885dad4436c8455cd196da415081c947124f4c520e03b9f36ce83ec7b5175",
+  ;     "5b1bd9864fad11263e8317080d794a1a62a2f70feffe51a5a471311af7df0436",
+  ;     "8b8a3b66a136a88237b8570b522825affd4637feb99074d6e26acb467fe84fed",
+  ;     "eb4580c136895611670f70a2238a8e4ec3c1c7d876a1bedbbb412859f5c171c3",
+  ;     "d5002e6e9e9a4f0eca6c655c1eda01432899612ab90a82b6824a34fc2e4a43df",
+  ;     "1114cf988a18deb716da8857f3d2eb8b38b90359584f9979a88f90b6b5417820",
+  ;     "7121977017e6ec010af4cd005d823c2b1a74b6b0976e76f89ce3d806ceaad672"
+  ;   ]
+  [
+      "6f74d22f157c11c730931b23fbb8725b21eb551d8571d7c5a190d29594db9c2d",
+      "6f8546129463a42dba32bdd9c18b47d5f6139b6e3570a94346916439be0bacad"
+    ]
+
+  )
+
+  (printtokenlist)
+
+
+  (get-collection "pass")
+  (get-all-collection)
+
+  (test-capability (pass.coin.TRANSFER "user" "abc" 2.0))
+  (test-capability (pass.testdemo1.MINT-PASS "user" 1.0))
+  (mint-pass
+    "user"
+    (read-keyset "user-ks")
+    1.0
+    "pass"
+    1
+    pass.testdemo1policy
+  )
+
+
+
+
+  ; (get-nft-info-by-owner "user")
+(get-tokens-owned "user")
+
+(marmalade.ledger.get-manifest "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w")
+
+(marmalade.ledger.get-balance "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w" "user" )
+
+(pass.testdemo1policy.get-owner "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w")
+
+(pass.testdemo1policy.get-minted)
+
+
+
+
+
+
+
+
+
+; (read-keyset "user")
+; (test-capability (marmalade.ledger.BURN "QBTUBinFJiNDjPXGd5B0vlRxfTrvjXQYd6ImEpkfi6s" "user" 0.5))
+; (marmalade.ledger.burn "QBTUBinFJiNDjPXGd5B0vlRxfTrvjXQYd6ImEpkfi6s" "user" 0.5)
+
+
+(commit-tx)
+
+
+(begin-tx)
+
+(use pass.testdemo1)
+(use kip.token-manifest)
+
+
+(test-capability (pass.testdemo1.PRIVATE))
+(test-capability (pass.coin.TRANSFER "user" "abc" 2.0))
+(test-capability (pass.testdemo1.MINT-PASS "user" 1.0))
+
+
+(mint-pass
+  "user"
+  (read-keyset "user-ks")
+  1.0
+  "pass"
+  1
+  pass.testdemo1policy
+)
+; (get-nft-info-by-owner "user")
+(ids-owned-by "user")
+(get-passbalance "user")
+; (burn "user")
+; (get-passbalance "user")
+
+(commit-tx)
+
+(begin-tx)
+
+(use pass.testdemo1)
+(use kip.token-manifest)
+(use pass.testdemo1policy)
+
+(updatetokenlist ["aryahumaiok"])
+(updatelist ["aryahumaiok"])
+
+(printtokenlist)
+
+
+(test-capability (pass.testdemo1.PRIVATE))
+(test-capability (pass.coin.TRANSFER "user" "abc" 2.0))
+(test-capability (pass.testdemo1.MINT-PASS "user" 1.0))
+
+(mint-pass
+  "user"
+  (read-keyset "user-ks")
+  1.0
+  "pass"
+  1
+  pass.testdemo1policy
+)
+; (get-nft-info-by-owner "user")
+(ids-owned-by "user")
+(get-passbalance "user")
+; (burn "user")
+; (get-passbalance "user")
+
+(commit-tx)
+
+(begin-tx)
+(use pass.testdemo1)
+(use kip.token-manifest)
+(use pass.testdemo1policy)
+
+(updatetokenlist ["aryahumaiokcool"])
+(updatelist ["aryahumaiokcool"])
+
+(printtokenlist)
+
+
+(test-capability (pass.testdemo1.PRIVATE))
+(test-capability (pass.coin.TRANSFER "user" "abc" 2.0))
+(test-capability (pass.testdemo1.MINT-PASS "user" 1.0))
+
+(mint-pass
+  "user"
+  (read-keyset "user-ks")
+  1.0
+  "pass"
+  1
+  pass.testdemo1policy
+)
+; (get-nft-info-by-owner "user")
+(ids-owned-by "user")
+(get-passbalance "user")
+; (burn "user")
+; (get-passbalance "user")
+
+(commit-tx)
+(begin-tx "marketplace-testing")
+; (use marmalade.ledger)
+(use pass.demomarketplace1)
+; (use pass.testdemo1)
+(use pass.testdemo1policy)
+
+(printtokenlist)
+
+; (env-data {
+;   "pass.demotest-ks-1":{"keys":["merch"],"pred":"keys-all"}
+;   })
+
+
+; (env-keys ["mar" "merch" "user" "pass"])
+
+
+; (env-sigs
+;   [{'key:'user,'caps: [
+;     (marmalade.ledger.OFFER "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w"
+;                             "user" 1.0 110)
+;     ]}
+;   ,{'key:'sale,'caps: [
+;      (marmalade.ledger.OFFER "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w"
+;                              "user" 1.0 110)
+;    ]}
+;   ])
+; (env-sigs
+;   [{'key:'user
+;    ,'caps:
+;     [(marmalade.ledger.OFFER "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w" "user" 1.0 110)]}
+;  ])
+
+; (use toke)
+ ; (env-data
+ ; {
+ ;   "user":"user",
+ ;   "user2":"user2",
+ ; "creator":"creator",
+ ; 'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+ ; 'user-ks: {"keys": ["user"], "pred": "keys-all"},
+ ; 'user2-ks: {"keys": ["user2"], "pred": "keys-all"}
+ ;
+ ;
+ ; }
+ ;
+ ;
+ ;   )
+
+ (env-sigs [{
+   'key: 'user
+   , 'caps:
+     [(marmalade.ledger.TRANSFER "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w" "user" "arya" 1.0)]
+   }])
+
+   (get-owner "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w")
+
+(open-sale "pass" "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w" "user" 2.0 0 1)
+(get-owner "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w")
+
+; (get-sale "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w")
+
+
+
+(commit-tx)
+
+(begin-tx)
+(use pass.demomarketplace1)
+(use pass.testdemo1policy)
+
+(env-data
+  {'user2: "user2" })
+(env-sigs
+  [{'key:'user
+   ,'caps:
+    [(marmalade.ledger.TRANSFER "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w" "arya" "user2" 1.0)]}
+  ,{'key:'transfer,'caps: []}
+  ])
+; (env-sigs [{
+;   'key: 'user2
+;   , 'caps:
+;     [(marmalade.ledger.TRANSFER "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w" "arya" "user2" 1.0)
+; ]
+;   }])
+(test-capability (pass.coin.TRANSFER "user2" "arya" 0.08))
+(test-capability (pass.coin.TRANSFER "user2" "user" 2.97))
+(buy "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w" "user2")
+(get-sale "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w")
+
+(get-tokens-owned "user")
+
+(get-owner "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w")
+(get-tokens-owned "user2")
+(marmalade.ledger.get-balance "pass:0LEVK4luKFwPetjfiROBRSltox6BcxWssQYsdfgs-7w" "user2" )
+
+
+(printtokenlist)
+
+
+(printtokenlist)
+
+
+(commit-tx)

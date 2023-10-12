@@ -1,0 +1,554 @@
+(begin-tx)
+(define-namespace "free" (sig-keyset) (sig-keyset))
+(define-namespace "kip" (sig-keyset) (sig-keyset))
+(define-namespace "util" (sig-keyset) (sig-keyset))
+(env-keys ["pass" "copper" "creator"])
+(env-data {
+  "dum-pass-ks":{"keys":["pass"],"pred":"keys-all"},
+  "dumpthreeks":{"keys":["pass"],"pred":"keys-all"},
+  "dumpfourks":{"keys":["pass"],"pred":"keys-all"},
+  "dump-fourteen-ks":{"keys":["pass"],"pred":"keys-all"},
+  "dummypolicynineks":{"keys":["pass"],"pred":"keys-all"},
+  "padmin-ten-ks":{"keys":["pass"],"pred":"keys-all"},
+  "coin-guard":{"keys":["pass"],"pred":"keys-all"},
+  "pass-ks":{"keys":["pass"],"pred":"keys-all"},
+  "marmalade-admin":{"keys":["pass"],"pred":"keys-all"},
+  "util-ks":{"keys":["pass"],"pred":"keys-all"},
+  "dummypolicysevenks":{"keys":["pass"],"pred":"keys-all"},
+  "pfive-ks":{"keys":["pass"],"pred":"keys-all"},
+  "ppten-ks":{"keys":["pass"],"pred":"keys-all"}
+
+  })
+
+(load "manifest.pact")
+(load "pass-token-policy-v1.pact")
+(load "util.guards.pact")
+(load "fungible-xchain-v1.pact")
+(load "fungible-v2.pact")
+
+(load "coin.pact")
+(load "pass-fungible-v2.pact")
+(load "kip.account-protocols-v1.pact")
+(load "util.fungible-util.pact")
+;(load "pass.pact")
+(load "duplicatepass2.pact")
+(load "duplicate-prioritypass-policy2.pact")
+; (load "twoduplicate-prioritypass-policy.pact")
+
+(commit-tx)
+
+(begin-tx "creating collection")
+(use free.passtest10)
+(use free.policytest10)
+(use free.dumbp-fungible)
+(use kip.token-manifest)
+
+(print "length")
+; (prin)
+(env-data {
+   'creator: "creator",
+   'user: "user",
+   'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+   'user-ks: {"keys": ["user"], "pred": "keys-all"},
+   ; "token_spec": {
+   ;   'fungible: coin,
+   ;   'creator: "creator",
+   ;   'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+   ;   'owner: "creator",
+   ;   "royalty-rate": 0.1
+   ;   },
+     ;"tokens-list": ["9d29359484f9253a8647894c5a37bf52a95311e2e31430479c728685d11ee5e7", "57e838bca35211184203bb427d84f36419cff87479bef78ea539abbe4a9b8ca6", "86556133fc5495f76b4e76c188b4e85cdfe6359d9bf3b88d7b79a3668222bd02", "c14835a5b545199f707681d72beff6190b96e5f37cefa34588d2f22de1cc32d6", "7fc9a2b5709432a0b245bea55e0661cb041046fe7c175f91ce2275fc6aabb163", "453129037a10036587cac5375c00e8ad40d024c4d6aa84abeb34b225996870b6"],
+     "tokens-list": ["OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA", "ypHr-r69c8ux1DcBn5RZiuX5oWYELwidXDnxNL9VT5I", "S4SMB4o64QzXe5rD3tbYtGCVoVbfn5a0OWUZD5JrQP4", "gD4YpDuxaTpA83_7Rdp1xXzdiYqmgjAv4No3VwxQs8M", "AILSceqfauxaTpA83_7Rdp1xXzdiYqmgjAv4No3Vwaffaa", "WXWtMhRIAiyZU7zuIdbAneIbvmy-eUoCq2CM1_kB4N0"],
+
+     "provenance": "asjnasf",
+
+      'name: "PASS",
+      'symbol: "PP",
+      'total-supply: 1000,
+      'creator: "collection",
+      'policy: free.policytest10,
+      'guard: {"keys": ["collection"], "pred": "keys-all"},
+      'token: {
+          'id: "",
+          'manifest: (create-manifest (uri "text" "") []),
+          'precision: 0,
+          'supply: 1.0
+          },
+
+ ;      "collection": {
+ ; 'name: "PASS",
+ ; 'symbol: "pp",
+ ; 'total-supply: 10,
+ ; 'creator: "collection",
+ ; 'policy: free.policytest10,
+ ; 'guard: {"keys": ["collection"], "pred": "keys-all"},
+ ; 'token: {
+ ;     'id: "",
+ ;     'manifest: (create-manifest (uri "text" "") []),
+ ;     'precision: 0,
+ ;     'supply: 1.0
+ ;     ; 'policy: free.babena-royalty-policy
+ ;     }
+ ;     },
+
+     'name: "PASS",
+     'fungible: free.dumbp-fungible,
+     'price-per-nft: 2.0,
+     'max-per-user: 2,
+     'max-per-tx:1,
+     'total-supply: 6,
+     'total-supply1: 1000
+  })
+
+  (expect "create creator account " "Write succeeded"
+  (free.coin.create-account "creator" (read-keyset 'creator-guard) ))
+
+(expect "create user account " "Write succeeded"
+(free.coin.create-account "user" (read-keyset 'user-ks) ))
+
+ (test-capability (free.coin.COINBASE))
+
+   (expect "coinbase buyer" "Write succeeded"
+   (free.coin.coinbase "user" (read-keyset 'user-ks) 100.0))
+
+   (expect "create user account " "Write succeeded"
+   (free.coin.create-account "user1" (read-keyset 'user-ks) ))
+
+    (test-capability (free.coin.COINBASE))
+
+      (expect "coinbase buyer" "Write succeeded"
+      (free.coin.coinbase "user1" (read-keyset 'user-ks) 2.0))
+
+(commit-tx)
+
+(begin-tx)
+
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+
+
+; (initialize
+;   (read-msg 'provenance)
+;   (read-msg 'tokens-list)
+;   (read-msg 'creator)
+;   (read-msg 'creator-guard)
+;   (read-integer 'total-supply)
+;   (read-integer 'max-per-user)
+;   (read-integer 'max-per-tx)
+;   (read-msg 'price-per-nft)
+;   (read-msg 'name)
+;   )
+; (expect "Create token Collection"
+;   true
+;   (create-collection (read-msg 'collection)))
+;
+; (expect "Create token events"
+;   [{"name": "free.passtest10.COLLECTION","params": [(read-msg 'collection)]}]
+;     (map (remove 'module-hash) (env-events true)))
+;(test-capability (MERCH))
+(expect "Create token Collection"
+  true
+  (create-collection "PASS" "pp" 10 free.policytest10 (read-keyset "guard") "collection" (read-msg 'token))
+)
+ (expect "Create token events"
+    [{"name": "free.passtest10.COLLECTION","params": ["PASS" "pp" 10 free.policytest10 (read-keyset "guard") "collection" (read-msg 'token)]}]
+      (map (remove 'module-hash) (env-events true)))
+
+
+;(get-collection "PASS")
+
+
+(env-data {
+
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo",
+  "dumpolicyfive":{"keys":["pass"],"pred":"keys-all"}
+
+  })
+
+  (create-token (read-msg 'token) 1
+    (create-manifest (uri "text" "project-3-uri") []) free.policytest10 "PASS")
+
+
+
+  (expect "Create token events"
+    [{"name": "free.passtest10.TOKEN","params": [(read-msg 'token) 1 1.0 free.policytest10]}]
+      (map (remove 'module-hash) (env-events true)))
+
+(commit-tx)
+
+
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+
+(print "price of nft")
+(get-price)
+
+;(update-pass-price .0)
+
+
+
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+
+
+
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+    ; (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+    ; (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+    ; (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+    ; (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+
+
+
+
+
+  ; (expect "Create and mint fqp token EVENTS"
+  ;   [{"name": "free.passtest10.MINT-PASS","params": ["user" 1.0]}
+  ;   {"name": "free.coin.TRANSFER","params": ["user" "creator" 2.0]}
+  ;   {"name": "free.passtest10.ACCOUNT_GUARD","params": [(read-msg 'token) "user" (read-keyset 'user-ks)]}
+  ;   {"name": "free.passtest10.RECONCILE","params": [(read-msg 'token) 1.0
+  ;   { "account": "",
+  ;     "current": 0.0,
+  ;     "previous": 0.0
+  ;   }  { "account": "user",
+  ;     "current": 1.0,
+  ;     "previous": 0.0
+  ;     }]}
+  ;   ]
+  ;     (map (remove 'module-hash) (env-events true)))
+
+
+
+(get-tokens-owned "user")
+; (get-token-uri "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo")
+(commit-tx)
+;
+
+; (begin-tx)
+; (use free.passtest10)
+; (use free.policytest10)
+; (use kip.token-manifest)
+; (env-data {
+;   "creator-guard": {"keys": ["collection"], "pred": "keys-all"},
+;   "collection": {"keys": ["pass"], "pred": "keys-all"},
+;   'user-ks: {"keys": ["user"], "pred": "keys-all"}
+;
+;
+;   })
+;
+; (create-token
+;   "PASS #1"
+;   1
+;   (create-manifest (uri "pass1" "Dummy token-uri") [])
+;   free.policytest10
+;   "PASS"
+;   )
+;
+; (print "infor")
+; (get-policy-info "PASS #1")
+; (test-capability (PRIVATE))
+; (test-capability (CREDIT "PASS #1" "user"))
+; (test-capability (CREDIT-MERCH "user"))
+; (test-capability (free.coin.TRANSFER "user" "creator" 2.0))
+; (mint-pass "user" (read-keyset 'user-ks) 1.0 "PASS" 1)
+;
+;
+; (get-account-minted "user")
+; (get-tokens-owned "user")
+; (get-passbalance "user")
+; (env-data {
+;   "free.pass-ks": {"keys": ["user"], "pred": "keys-all"}
+;   })
+;
+; (test-capability (MERCH))
+; (burn "user")
+; (get-passbalance "user")
+;
+;
+; (commit-tx)
+
+; (begin-tx "second token")
+; (use free.passtest10)
+; (use free.policytest10)
+; (use kip.token-manifest)
+;
+; (env-data {
+;   "creator-guard": {"keys": ["collection"], "pred": "keys-all"},
+;   "collection": {"keys": ["pass"], "pred": "keys-all"},
+;   'user-ks: {"keys": ["user"], "pred": "keys-all"}
+;
+;
+;   })
+; (create-token
+;   "PASS #2"
+;   2
+;   (create-manifest (uri "pass1" "Dummy token-uri") [])
+;   free.policytest10
+;   "PASS"
+;   )
+;
+; (print "token-2")
+; (get-policy-info "PASS #2")
+; (test-capability (PRIVATE))
+; (test-capability (CREDIT "PASS #2" "user"))
+; (test-capability (CREDIT-MERCH "user"))
+; (test-capability (free.coin.TRANSFER "user" "creator" 2.0))
+;
+; (test-capability (MINT-PASS "user" 4.0))
+; (mint-bulk-pass "user" (read-keyset 'user-ks) 4.0 "PASS" 1)
+;
+;
+; (get-account-minted "user")
+; (get-tokens-owned "user")
+; (get-passbalance "user")
+; (env-data {
+;   'pass-ks: {"keys": ["user"], "pred": "keys-all"}
+;   })
+;
+; (test-capability (MERCH))
+; (burn "user")
+; (get-passbalance "user")
+;
+;
+;
+;
+; (commit-tx)
+
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+; (get-tokens-owned "user")
+(commit-tx)
+
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+; (get-tokens-owned "user")
+(commit-tx)
+
+
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+; (get-tokens-owned "user")
+(commit-tx)
+
+
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+(get-tokens-owned "user")
+(commit-tx)
+
+
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    ; (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+(get-tokens-owned "user")
+(commit-tx)
+
+
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+(get-tokens-owned "user")
+(commit-tx)
+
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+(get-tokens-owned "user")
+(commit-tx)
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+(get-tokens-owned "user")
+(commit-tx)
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+(get-tokens-owned "user")
+(commit-tx)
+(begin-tx)
+(use free.passtest10)
+(use free.policytest10)
+(use kip.token-manifest)
+(env-data {
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  'token: "PASS:ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo"
+  })
+  (env-chain-data {"prev-block-hash": "a7PmSRrDFGUg8R7bEbhLOYw0gn_FqCdyekvRfK9xFBc"})
+  (env-sigs
+    [{'key:'user
+     ,'caps:
+      [(free.passtest10.MINT-PASS "user" 2.0)
+      (free.coin.TRANSFER "user" "creatordemoaccount" 2.0)
+       ]}])
+       (test-capability (CREDIT "ZM9qH07Aj_cdOTICf6aFxGP31dQ4c409Eed6rslczfo" "user"))
+       (test-capability (CREDIT-MERCH "user"))
+    (test-capability (free.coin.TRANSFER "user" "passdemoacc9" 2.0))
+    (free.passtest10.mint-pass 'user (read-keyset 'user-ks) 2.0 "PASS" 1)
+(get-tokens-owned "user")
+(get-minted)
+(commit-tx)
+
+;

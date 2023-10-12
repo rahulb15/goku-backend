@@ -1,0 +1,584 @@
+(begin-tx)
+
+(define-namespace "free" (sig-keyset) (sig-keyset))
+(define-namespace "kip" (sig-keyset) (sig-keyset))
+(define-namespace "util" (sig-keyset) (sig-keyset))
+(env-keys ["cooper" "pass"])
+(env-data {
+  "testdbone-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "pass-ks":{"keys":["pass"],"pred":"keys-all"},
+  "testdbpolicytwo-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "dummydbnine-policy-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "db-sale-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "marmalade-admin":{"keys":["cooper"],"pred":"keys-all"},
+  "coin-guard":{"keys":["cooper"],"pred":"keys-all"},
+  "creator-guard":{"keys":["cooper"],"pred":"keys-all"},
+  "util-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "dbtest-ks-four":{"keys":["cooper"],"pred":"keys-all"},
+  "dbpolicy-ks-four":{"keys":["cooper"],"pred":"keys-all"}
+  })
+
+
+
+
+(load "manifest.pact")
+(load "dbc-token-policy-v1.pact")
+(load "util.guards.pact")
+(load "fungible-xchain-v1.pact")
+(load "fungible-v2.pact")
+(load "coin.pact")
+(load "newpassproject/pass-token-policy-v1.pact")
+
+(load "dbc-poly-fungible-v2.pact")
+(load "newpassproject/pass-fungible-v2.pact")
+
+(load "kip.account-protocols-v1.pact")
+(load "util.fungible-util.pact")
+;(load "db-presale.pact")
+(load "newpassproject/pass.pact")
+(load "dbcoppercontract4.pact")
+(load "db-policy4.pact")
+;(load "public-db-policy.pact")
+(commit-tx)
+
+(begin-tx)
+
+(use free.dbpolicytest4)
+(use free.dbcontracttest4)
+(use kip.token-manifest)
+
+(env-data {
+   'creator: "creator",
+   'user: "user",
+   "dummydbtwo-policy-ks":[],
+   'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+   'user-ks: {"keys": ["user"], "pred": "keys-all"},
+   "token_spec": {
+     'fungible: free.coin,
+     'creator: "creator",
+     'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+     'owner: "creator",
+     "royalty-rate": 0.1
+     },
+     "tokens-list": ["OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA","ksdmfkewmklmal", "ypHr-r69c8ux1DcBn5RZiuX5oWYELwidXDnxNL9VT5I", "S4SMB4o64QzXe5rD3tbYtGCVoVbfn5a0OWUZD5JrQP4", "gD4YpDuxaTpA83_7Rdp1xXzdiYqmgjAv4No3VwxQs8M", "AILSceqfauxaTpA83_7Rdp1xXzdiYqmgjAv4No3Vwaffaa", "WXWtMhRIAiyZU7zuIdbAneIbvmy-eUoCq2CM1_kB4N0"],
+    ; "tokens-list": [ "gD4YpDuxaTpA83_7Rdp1xXzdiYqmgjAv4No3VwxQs8M", "AILSceqfauxaTpA83_7Rdp1xXzdiYqmgjAv4No3Vwaffaa", "WXWtMhRIAiyZU7zuIdbAneIbvmy-eUoCq2CM1_kB4N0"],
+     "provenance": "asjnasf",
+     'name: "PASS",
+      'symbol: "PP",
+      'total-supply: 1000,
+      'creator: "collection",
+      'policy: free.dbpolicytest4,
+      'guard: {"keys": ["collection"], "pred": "keys-all"},
+      'token: {
+          'id: "",
+          'manifest: (create-manifest (uri "text" "") []),
+          'precision: 0,
+          'supply: 1.0
+          },
+     ; "collection": {
+     ;  'name: "db-cooper",
+     ;  'symbol: "DB",
+     ;  'total-supply: 7,
+     ;  'creator: "collection",
+     ;  'policy: free.dbpolicytest4,
+     ;  'guard: (read-keyset "creator-guard"),
+     ;  'token: {
+     ;      'id: "",
+     ;      'manifest: (create-manifest (uri "text" "") []),
+     ;      'precision: 0,
+     ;      'supply: 1.0
+     ;      }
+     ;      },
+     'name: "db-cooper",
+     'fungible: free.coin,
+     'price-per-nft: 2.0,
+     'max-per-wh:4,
+     'max-per-user: 2,
+     'public-mint-time:{"time": "2022-08-10T00:00:00Z"},
+     'whitelist-mint-time:{"time": "2022-08-09T00:00:00Z"},
+     'priority-mint-time:{"time": "2022-08-08T00:00:00Z"},
+     'mint-end-time:{"time": "2022-09-16T00:00:00Z"},
+     'whitelist-price:1.0,
+     'max-per-tx:1,
+     'total-supply: 7,
+     'total-supply1: 1000
+  })
+
+
+  (expect "create creator account " "Write succeeded"
+  (free.coin.create-account "creator" (read-keyset 'creator-guard) ))
+
+  (expect "create user account " "Write succeeded"
+  (free.coin.create-account "public" (read-keyset 'user-ks) ))
+  (test-capability (free.coin.COINBASE))
+   (expect "coinbase buyer" "Write succeeded"
+   (free.coin.coinbase "public" (read-keyset 'user-ks) 10.0))
+
+   (expect "create user account " "Write succeeded"
+   (free.coin.create-account "public-user2" (read-keyset 'user-ks) ))
+   (test-capability (free.coin.COINBASE))
+    (expect "coinbase buyer" "Write succeeded"
+    (free.coin.coinbase "public-user2" (read-keyset 'user-ks) 10.0))
+
+    (expect "create user account " "Write succeeded"
+    (free.coin.create-account "public-user3" (read-keyset 'user-ks) ))
+    (test-capability (free.coin.COINBASE))
+     (expect "coinbase buyer" "Write succeeded"
+     (free.coin.coinbase "public-user3" (read-keyset 'user-ks) 10.0))
+
+     (expect "create user account " "Write succeeded"
+     (free.coin.create-account "public-user4" (read-keyset 'user-ks) ))
+     (test-capability (free.coin.COINBASE))
+      (expect "coinbase buyer" "Write succeeded"
+      (free.coin.coinbase "public-user4" (read-keyset 'user-ks) 10.0))
+
+
+   (expect "create user account " "Write succeeded"
+   (free.coin.create-account "test-user1" (read-keyset 'user-ks) ))
+   (test-capability (free.coin.COINBASE))
+    (expect "coinbase buyer" "Write succeeded"
+    (free.coin.coinbase "test-user1" (read-keyset 'user-ks) 10.0))
+
+   (expect "create user account " "Write succeeded"
+   (free.coin.create-account "test" (read-keyset 'user-ks) ))
+
+   (test-capability (free.coin.COINBASE))
+
+    (expect "coinbase buyer" "Write succeeded"
+    (free.coin.coinbase "test" (read-keyset 'user-ks) 10.0))
+
+(expect "create user account " "Write succeeded"
+(free.coin.create-account "user" (read-keyset 'user-ks) ))
+(expect "create user account " "Write succeeded"
+(free.coin.create-account "user4" (read-keyset 'user-ks) ))
+(expect "create user account " "Write succeeded"
+(free.coin.create-account "user2" (read-keyset 'user-ks) ))
+(expect "create user account " "Write succeeded"
+(free.coin.create-account "user3" (read-keyset 'user-ks) ))
+ (test-capability (free.coin.COINBASE))
+  (test-capability (free.coin.COINBASE))
+
+   (expect "coinbase buyer" "Write succeeded"
+   (free.coin.coinbase "user" (read-keyset 'user-ks) 10.0))
+
+   (expect "coinbase buyer" "Write succeeded"
+   (free.coin.coinbase "user2" (read-keyset 'user-ks) 10.0))
+   (expect "coinbase buyer" "Write succeeded"
+   (free.coin.coinbase "user3" (read-keyset 'user-ks) 10.0))
+   (expect "coinbase buyer" "Write succeeded"
+   (free.coin.coinbase "user4" (read-keyset 'user-ks) 10.0))
+   (expect "create user account " "Write succeeded"
+   (free.coin.create-account "user1" (read-keyset 'user-ks) ))
+
+    (test-capability (free.coin.COINBASE))
+
+      (expect "coinbase buyer" "Write succeeded"
+      (free.coin.coinbase "user1" (read-keyset 'user-ks) 2.0))
+
+; (free.dbpolicytest4.initialize
+;   (read-msg 'provenance)
+;   (read-msg 'tokens-list)
+;   (read-msg 'creator)
+;   (read-msg 'creator-guard)
+;   (read-integer 'total-supply)
+;   (read-integer 'max-per-user)
+;   (read-integer 'max-per-wh)
+;   (read-integer 'max-per-tx)
+;   (read-msg 'public-mint-time)
+;   (read-msg 'whitelist-mint-time)
+;   (read-msg 'mint-end-time)
+;   (read-decimal 'price-per-nft)
+;   (read-decimal 'whitelist-price)
+;   (read-msg 'name)
+;   (read-msg 'fungible)
+;   )
+  ;
+  (expect "Create token Collection"
+      true
+      (create-collection "db-cooper" "DB" 6 free.dbpolicytest4 (read-msg 'guard ) "creator" (read-msg 'token))
+)
+      ; (expect "Create token Collection"
+      ; true
+      ; (create-collection "PASS" "pp" 10 free.dumpolicyfive (read-keyset "guard") "collection" (read-msg 'token))
+    ;
+    ; (expect "Create token events"
+    ;     [{"name": "free.dbcontracttest4.COLLECTION","params": ["db-cooper" "DB" 6 free.dbpolicytest4 (read-msg 'guard ) "creator" (read-msg 'token)]}]
+    ;       (map (remove 'module-hash) (env-events true)))
+
+
+(get-collection "db-cooper")
+
+(commit-tx)
+
+(begin-tx "getting collection")
+(use free.dbpolicytest4)
+(use free.dbcontracttest4)
+(use kip.token-manifest)
+(print "public-mint-time")
+(get-public-mint-time)
+
+; (free.dbpolicytest4.update-mint-time (time "2023-10-01T00:00:00Z")
+; (time "2022-11-01T00:00:00Z")
+; (time "2023-12-01T00:00:00Z") )
+
+(print "public-mint-time")
+(get-public-mint-time)
+
+; (get-collection "db-cooper")
+(commit-tx)
+
+
+; (begin-tx "creating token")
+; (use free.dbpolicytest4)
+; (use free.dbcontracttest4)
+; (use kip.token-manifest)
+; ;(use free.priority-pass)
+;
+; (env-data {
+;   "creator-guard": {"keys": ["collection"], "pred": "keys-all"},
+;   "collection": {"keys": ["pass"], "pred": "keys-all"},
+;   'user-ks: {"keys": ["user"], "pred": "keys-all"},
+;   "dummydb-one-ks":{"keys":["cooper"],"pred":"keys-all"},
+;   "guard": {"keys": ["collection"], "pred": "keys-all"},
+;   "pass-ks": {"keys": ["pass"], "pred": "keys-all"}
+;
+;   })
+;
+; (env-chain-data {"block-time": (parse-time "%F" "2022-08-08")})
+; (chain-data)
+
+; (free.dbcontracttest4.create-token
+;   "OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA"
+;   1
+;   (create-manifest (uri "pass1" "Dummy token-uri") [])
+;   free.dbpolicytest4
+;   "db-cooper"
+;   )
+  ; (free.dbcontracttest4.create-token
+  ;   "DB #2"
+  ;   2
+  ;   (create-manifest (uri "passxec" "Dummy teacoken-uri") [])
+  ;   free.dbpolicytest4
+  ;   "db-cooper"
+  ;   )
+  ; (free.dbcontracttest4.create-token
+  ;   "DB #3"
+  ;   3
+  ;   (create-manifest (uri "eace" "Dummy toeacken-uri") [])
+  ;   free.dbpolicytest4
+  ;   "db-cooper"
+  ;   )
+
+; (commit-tx)
+
+; (begin-tx "priority-sale")
+; (use free.dbpolicytest4)
+; (use free.dbcontracttest4)
+; (use kip.token-manifest)
+; (print 'chaindata)
+; (chain-data)
+; (add-priority-user "test")
+;
+; (test-capability (free.dbcontracttest4.PRIVATE))
+;
+; (test-capability (CREDIT "OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA" "user"))
+; (test-capability (CREDIT-COOPER "user"))
+;(test-capability (free.coin.TRANSFER "user" "creator" 2.0))
+;(free.dbcontracttest4.mint-cooper "test" (read-keyset 'user-ks) 1.0 "db-cooper" 1)
+
+;(free.dbcontracttest4.get-policy-info "DB #3")
+; (test-capability (free.dbcontracttest4.PRIVATE))
+; (add-priority-users ["user" "user2" "user3" ])
+;
+; (test-capability (CREDIT "DB #3" "test"))
+; (test-capability (CREDIT-COOPER "test"))
+;(test-capability (free.coin.TRANSFER "test" "creator" 1.0))
+;(test-capability (MERCH))
+;(free.dbcontracttest4.mint-cooper "test" (read-keyset 'user-ks) 1.0 "db-cooper" 1)
+;(free.dbcontracttest4.mint-cooper "user2" (read-keyset 'user-ks) 1.0 "db-cooper" 1)
+;(free.dbcontracttest4.mint-cooper "user3" (read-keyset 'user-ks) 1.0 "db-cooper" 1)
+;(mint-cooper "user1" (read-keyset 'user-ks) 1.0 "db-cooper" 1)
+; (get-account-minted "user")
+; (get-tokens-owned "user")
+; ;(printclaim "user")
+; ;(get-passbalance "user")
+; (commit-tx)
+
+
+;
+; (begin-tx)
+; (use free.dbpolicytest4)
+; (use free.dbcontracttest4)
+; (use kip.token-manifest)
+;
+; (create-collection "db-cooper" "DB" 6 free.dbpolicytest4 (read-keyset ) "k:arya" (read-msg 'token))
+; (commit-tx)
+; (begin-tx "priority-SALE")
+; (env-keys [
+;   "pass" "user"
+;   ])
+; (env-data
+;   {
+;     "pass-ks": {"keys": ["pass"], "pred": "keys-all"},
+;     'user-ks: {"keys": ["user"], "pred": "keys-all"}
+;     })
+; (use free.dbpolicytest4)
+; (use free.dbcontracttest4)
+; (use kip.token-manifest)
+; (env-chain-data {"block-time": (parse-time "%F" "2022-11-")})
+; (print "chain-data")
+; (chain-data)
+; (test-capability (free.priority-pass.MERCH))
+; (test-capability (free.dbcontracttest4.PRIVATE))`
+
+; (test-capability (CREDIT "" "test-user1"))
+; (test-capability (CREDIT-COOPER "test-user1"))
+; (add-priority-user "test-user1")
+; (test-capability (free.dbcontracttest4.MINT-COOPER "test-user1" 1.0))
+; (test-capability (free.dbcontracttest4.MINT-COOPER "user" 1.0))
+; (printclaim "test-user1")
+; (free.dbcontracttest4.mint-bulk-cooper "test-user1" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+
+; (free.dbcontracttest4.mint-bulk-cooper "user" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+; (print "toksn ownddee")
+; (get-tokens-owned "test-user1")
+; (printclaim "test-user1")
+;(free.dbcontracttest4.mint-cooper "test-user1" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+
+
+;(get-owner "db-cooper:OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA")
+;(get-collection "db-cooper")
+; (print "minted nft")
+; (get-minted)
+; (commit-tx)
+
+(begin-tx "priority-SALE")
+; (env-keys [
+;   "pass" "user" "cooper"
+;   ])
+(env-data
+  {
+    "pass-ks": {"keys": ["pass"], "pred": "keys-all"},
+    'user-ks: {"keys": ["user"], "pred": "keys-all"},
+    "dummydbtwo-policy-ks":{"keys":["cooper"],"pred":"keys-all"}
+    })
+(use free.dbpolicytest4)
+(use free.dbcontracttest4)
+(use kip.token-manifest)
+(env-data {
+  "dummydb-one-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "pass-ks":{"keys":["pass"],"pred":"keys-all"},
+  "testdbpolicy1-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "db-sale-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "marmalade-admin":{"keys":["cooper"],"pred":"keys-all"},
+  "coin-guard":{"keys":["cooper"],"pred":"keys-all"},
+  "creator-guard":{"keys":["cooper"],"pred":"keys-all"},
+  "util-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "creator-guard": {"keys": ["collection"], "pred": "keys-all"},
+  "collection": {"keys": ["pass"], "pred": "keys-all"},
+  'user-ks: {"keys": ["user"], "pred": "keys-all"},
+  "dummydb-one-ks":{"keys":["cooper"],"pred":"keys-all"},
+  "guard": {"keys": ["collection"], "pred": "keys-all"}
+
+  })
+; ; (env-chain-data {"block-time": (parse-time "%F" "2022-11-")})
+; (print "chain-data")
+; (chain-data)
+(test-capability (free.priority-pass.MERCH))
+(test-capability (free.dbcontracttest4.PRIVATE))
+;
+; ; (test-capability (CREDIT "" "test-user1"))
+; ; (test-capability (CREDIT-COOPER "test-user1"))
+; ; (add-priority-user "test-user1")'
+(env-chain-data {"block-time": (parse-time "%F" "2022-12-08")})
+
+; (check-public)
+; (env-chain-data {"block-time": (parse-time "%F" "2022-12-09")})
+;
+(test-capability (free.dbcontracttest4.MINT-COOPER "test-user1" 1.0))
+(test-capability (free.dbcontracttest4.MINT-COOPER "user" 1.0))
+; (printclaim "test-user1")
+; (add-whitelists ["test-user1"])
+(test-capability (free.coin.TRANSFER "test-user1" "dbtestacc4" 3.0))
+(free.dbcontracttest4.mint-bulk-cooper "test-user1" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+;
+;
+; ; (free.dbcontracttest4.mint-bulk-cooper "user" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+(print "****")
+(get-tokens-owned "test-user1")
+; ; (printclaim "test-user1")
+; ;(free.dbcontracttest4.mint-cooper "test-user1" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+;
+;
+; ;(get-owner "db-cooper:OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA")
+; ;(get-collection "db-cooper")
+(commit-tx)
+
+
+;
+; (begin-tx "whitelistsale")
+; (env-keys ["cooper" "pass"])
+; (env-data {
+;   "dummydb-one-ks":{"keys":["cooper"],"pred":"keys-all"},
+;   "pass-ks":{"keys":["pass"],"pred":"keys-all"},
+;   "dummydbtwo-policy-ks":{"keys":["cooper"],"pred":"keys-all"},
+;   "db-sale-ks":{"keys":["cooper"],"pred":"keys-all"},
+;   "marmalade-admin":{"keys":["cooper"],"pred":"keys-all"},
+;   "coin-guard":{"keys":["cooper"],"pred":"keys-all"},
+;   "creator-guard":{"keys":["cooper"],"pred":"keys-all"},
+;   "util-ks":{"keys":["cooper"],"pred":"keys-all"},
+;   "creator-guard": {"keys": ["collection"], "pred": "keys-all"},
+;   "collection": {"keys": ["pass"], "pred": "keys-all"},
+;   'user-ks: {"keys": ["user"], "pred": "keys-all"},
+;   "dummydb-one-ks":{"keys":["cooper"],"pred":"keys-all"},
+;   "guard": {"keys": ["collection"], "pred": "keys-all"}
+;
+;   })
+; (use free.dbpolicytest4)
+; (use free.dbcontracttest4)
+; (use kip.token-manifest)
+; (use free.priority-pass)
+; ; (add-whitelists ["public" "user4"])
+;
+; ; ;(end-mint)
+; ; ;(print "pp user")
+; ; ;(get-priority-users)
+; ; (env-chain-data {"block-time": (parse-time "%F" "2022-11-01")})
+; ; (chain-data)
+; ;
+; ;
+; ; ; (test-capability (free.priority-pass.MERCH))
+; ; ; (test-capability (free.dbcontracttest4.PRIVATE))
+; ; ; (test-capability (CREDIT "" "test-user1"))
+; ; ; (test-capability (CREDIT-COOPER "test-user1"))
+; ; ; ;(add-priority-user "test-user1")
+; ; ;
+; ; ; (free.dbcontracttest4.mint-cooper "test-user1" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+; ;
+; ;
+; ; (test-capability (free.dbpolicytest4.COOPER))
+; ; (test-capability (free.dbpolicytest4.PRIVATE))
+; ; (test-capability (free.dbcontracttest4.PRIVATE))
+; ; (add-whitelists ["user1" "user4"])
+; ;
+; ; (test-capability (CREDIT "DB #3" "user1"))
+; ; (test-capability (CREDIT-COOPER "user1"))
+; ; (test-capability (CREDIT "DB #3" "user4"))
+; ; (test-capability (CREDIT-COOPER "user4"))
+; ; (test-capability (free.coin.TRANSFER "user1" "dbdemosevenaccount" 2.0))
+; ; ; (test-capability (free.coin.TRANSFER "user4" "creator" 1.0))
+; ; (test-capability (free.dbcontracttest4.MINT-COOPER "user1" 1.0))
+; ; (free.dbcontracttest4.mint-bulk-cooper "user1" (read-keyset 'user-ks) 1.0 "db-cooper" 1)
+; ; ;(free.dbcontracttest4.mint-cooper "user4" (read-keyset 'user-ks) 1.0 "db-cooper" 1)
+; ;
+; ; ;(mint-cooper "user1" (read-keyset 'user-ks) 1.0 "db-cooper" 1)
+; ; (get-account-minted "user1")
+; ; (get-tokens-owned "user1")
+; ; (get-account-minted "user4")
+; ; (get-tokens-owned "user4")
+;
+; ; (print "get-details")
+; ; (get-details)
+; (commit-tx)
+
+
+; (begin-tx "public sale")
+; (use free.dbpolicytest4)
+; (use free.dbcontracttest4)
+; (use kip.token-manifest)
+; (env-chain-data {"block-time": (parse-time "%F" "2022-11-05")})
+; (chain-data)
+;
+; ; (test-capability (free.dbcontracttest4.PRIVATE))
+; ; (test-capability (CREDIT "" "public"))
+; ; (test-capability (CREDIT-COOPER "public"))
+; ; (add-whitelists ["public" "user4"])
+;
+; (test-capability (free.coin.TRANSFER "public" "dbdemosevenaccount" 3.0) )
+; (test-capability (free.dbcontracttest4.MINT-COOPER "public" 1.0))
+; (free.dbcontracttest4.mint-bulk-cooper "public" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+; (print "token owner")
+; (get-tokens-owned "public")
+; (get-total-minted)
+; (get-minted)
+;
+; (test-capability (CREDIT "" "public-user2"))
+; (test-capability (CREDIT-COOPER "public-user2"))
+; (test-capability (free.coin.TRANSFER "public-user2" "creator" 2.0) )
+; ;(free.dbcontracttest4.mint-cooper "public-user2" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+; (print "token owner")
+; (get-tokens-owned "public-user2")
+; (get-total-minted)
+; (get-minted)
+;
+; (test-capability (CREDIT "" "public-user3"))
+; (test-capability (CREDIT-COOPER "public-user3"))
+; (test-capability (free.coin.TRANSFER "public-user3" "creator" 2.0) )
+; ;(free.dbcontracttest4.mint-cooper "user3" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+; (print "token owner")
+; (get-tokens-owned "public-user3")
+; (get-total-minted)
+; (get-minted)
+;
+;
+; (test-capability (CREDIT "" "public-user4"))
+; (test-capability (CREDIT-COOPER "public-user4"))
+; (test-capability (free.coin.TRANSFER "public-user4" "creator" 2.0) )
+; ;(free.dbcontracttest4.mint-cooper "public-user4" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+; (print "token owner")
+; (get-tokens-owned "public-user4")
+; (get-total-minted)
+; (get-minted)
+;
+; (commit-tx)
+;
+; ; (begin-tx)
+; ; (use free.dbpolicytest4)
+; ; (use free.dbcontracttest4)
+; ; (use kip.token-manifest)
+; ; (test-capability (free.dbcontracttest4.PRIVATE))
+; ;
+; ; (test-capability (CREDIT "" "public-user4"))
+; ; (test-capability (CREDIT-COOPER "public-user4"))
+; ; (test-capability (free.coin.TRANSFER "public-user4" "creator" 2.0) )
+; ; (free.dbcontracttest4.mint-cooper "public-user4" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+; ; (print "token owner")
+; ; (get-tokens-owned "public-user4")
+; ; (get-total-minted)
+; ; (get-minted)
+; ; (commit-tx)
+; ;
+; ; (begin-tx)
+; ; (use free.dbpolicytest4)
+; ; (use free.dbcontracttest4)
+; ; (use kip.token-manifest)
+; ; (test-capability (free.dbcontracttest4.PRIVATE))
+; ;
+; ; (test-capability (CREDIT "" "public-user4"))
+; ; (test-capability (CREDIT-COOPER "public-user4"))
+; ; (test-capability (free.coin.TRANSFER "public-user4" "creator" 2.0) )
+; ; (free.dbcontracttest4.mint-cooper "public-user4" (read-keyset "user-ks") 1.0 "db-cooper" 1)
+; ; (print "token owner")
+; ; (get-tokens-owned "public-user4")
+; ; (get-total-minted)
+; ; (get-minted)
+; ;
+; ; (commit-tx)
+; ;
+; (begin-tx "token details")
+; (use free.dbpolicytest4)
+; (use free.dbcontracttest4); ; ;
+; (use kip.token-manifest)
+; ;(get-manifest "db-cooper:OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA")
+; (create-token "db-cooper:mR2mZE-WGGqKHnowwM0MnoRuKMN4iEz-gue63ro2FIk" 2
+;   (create-manifest (uri "passxec" "Dummy teacoken-uri") [])
+;   free.dbpolicytest4
+;   "db-cooper")
+;
+;
+; (get-token-uri "db-cooper:mR2mZE-WGGqKHnowwM0MnoRuKMN4iEz-gue63ro2FIk")
+; ;(get-token "DB #2")
+; ;(get-token "db-cooper:vnQ1UYOscu3ni7KSoy4CZ9DSra1Skt4XMLU6wSh2yJA")
+; ;(get-owner "db-cooper:vnQ1UYOscu3ni7KSoy4CZ9DSra1Skt4XMLU6wSh2yJA")
+; (get-mint-status)
+; (commit-tx)

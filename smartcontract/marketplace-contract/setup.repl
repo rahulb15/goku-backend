@@ -1,0 +1,266 @@
+(begin-tx)
+
+(define-namespace "free" (sig-keyset) (sig-keyset))
+(define-namespace "kip" (sig-keyset) (sig-keyset))
+(define-namespace "util" (sig-keyset) (sig-keyset))
+
+(load "fungible-v2.pact")
+(load "coin.pact")
+(load "account-protocols-v1.pact")
+(load "fungible-util.pact")
+(load "guard.pact")
+(load "manifest.pact")
+(load "merch-token-policy-v1.pact")
+(load "poly-fungible-v2.pact")
+
+
+; (env-keys [ ])
+(env-data {
+  "mpolicyfour-ks":{"keys":["copper"],"pred":"keys-all"},
+  "mtestfour-ks":{"keys":["copper"],"pred":"keys-all"},
+  "upgrade":false
+  })
+
+
+(load "kryptomerchMarketPlace2.pact")
+(load "merch-policy2.pact")
+(commit-tx)
+
+(begin-tx)
+
+(use kip.token-manifest)
+(env-data {
+   'upgrade: false,
+   'creator: "creator",
+   'user: "user",
+   'user-ks: {"keys": ["user"], "pred": "keys-all"},
+   'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+   'mint-guard: {"keys": ["mint"], "pred": "keys-all"},
+   "token_spec": {
+     'fungible: coin,
+     'creator: "creator",
+     'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+     'owner: "creator",
+     "royalty-rate": 0.1
+     },
+     "tokens-list": ["OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA", "ypHr-r69c8ux1DcBn5RZiuX5oWYELwidXDnxNL9VT5I", "S4SMB4o64QzXe5rD3tbYtGCVoVbfn5a0OWUZD5JrQP4", "gD4YpDuxaTpA83_7Rdp1xXzdiYqmgjAv4No3VwxQs8M", "AILSceqfauxaTpA83_7Rdp1xXzdiYqmgjAv4No3Vwaffaa", "WXWtMhRIAiyZU7zuIdbAneIbvmy-eUoCq2CM1_kB4N0"],
+     "provenance": "asjnasf",
+      'name: "kryptomerch",
+      'symbol: "KM",
+      'total-supply: 10000,
+      'creator: "collection",
+      'policy: free.mpolicy3,
+      'guard: {"keys": ["collection"], "pred": "keys-all"},
+      'token: {
+          'id: "",
+          'manifest: (create-manifest (uri "text" "") []),
+          'precision: 0,
+          'supply: 1.0
+          ; 'policy: free.babena-royalty-policy
+          },
+
+     'public-mint-time: {"time": "1970-01-03T00:00:00Z"},
+     'whitelist-mint-time: {"time": "1970-01-03T00:00:00Z"},
+     'mint-end-time: {"time": "1970-01-03T00:00:00Z"},
+     'royalty-receiver: "r-receiver",
+     'price-per-nft: 2.0,
+     'whitelist-price: 1.0,
+     "royalty-rate": 0.1,
+     'max-per-user: 2,
+     'total-supply: 6,
+     'total-supply1: 10000,
+     'max-per-wh: 1
+  })
+
+
+  (expect "create creator account " "Write succeeded"
+    (coin.create-account "creator" (read-keyset 'creator-guard) ))
+
+  (expect "create user account " "Write succeeded"
+  (coin.create-account "user" (read-keyset 'user-ks) ))
+
+   (test-capability (coin.COINBASE))
+
+     (expect "coinbase buyer" "Write succeeded"
+     (coin.coinbase "user" (read-keyset 'user-ks) 10.0))
+
+     (expect "create user account " "Write succeeded"
+     (coin.create-account "user1" (read-keyset 'user-ks) ))
+
+      (test-capability (coin.COINBASE))
+
+        (expect "coinbase buyer" "Write succeeded"
+        (coin.coinbase "user1" (read-keyset 'user-ks) 2.0))
+
+(commit-tx)
+
+(begin-tx)
+(use kip.token-manifest)
+(use free.mtest3)
+(use free.mpolicy3)
+
+
+(create-collection "merch" "M" 100 free.mpolicy3 (read-msg "guard") "merchadmin" (read-msg "token"))
+(expect "Create token events"
+  [{"name": "free.mtest3.COLLECTION","params": ["merch" "M" 100 free.mpolicy3 (read-msg "guard") "merchadmin" (read-msg "token")]}]
+    (map (remove 'module-hash) (env-events true)))
+(get-collection "merch")
+
+
+
+(commit-tx)
+(begin-tx)
+(use kip.token-manifest)
+(use free.mtest3)
+(use free.mpolicy3)
+(env-keys ["copper" "user"])
+(env-data {
+  "free.merchpolicyone-admin-ks":{"keys":["copper"],"pred":"keys-all"},
+  'user-ks: {"keys": ["user"], "pred": "keys-all"}
+
+
+  })
+
+; (test-capability(free.mpolicy3.PRIVATE))
+; (test-capability (free.mpolicy3.MERCH))
+(env-chain-data {"block-time": (parse-time "%F" "2022-11-17")})
+
+(add-whitelists ["user"])
+(test-capability (free.mtest3.MINT-MERCH "user" 1.0))
+(test-capability (coin.TRANSFER "user" "merchcreator3" 2.0))
+(mint-bulk-merch "user" (read-keyset 'user-ks) 1.0 "merch" 1)
+(get-tokens-owned "user")
+
+(env-sigs
+  [{'key:'collection
+  ,'caps:[]}])
+  (free.mtest3.create-token
+  "kryptomerch:mR2mZE-WGGqKHnowwM0MnoRuKMN4iEz-gue63ro2FIk"
+  1
+  (create-manifest (uri "merch" "Dummy token-uri") [])
+  free.mpolicy3
+  "merch"
+  )
+(get-token-uri  "kryptomerch:mR2mZE-WGGqKHnowwM0MnoRuKMN4iEz-gue63ro2FIk")
+; (sale-account)
+; (offer "kryptomerch:mR2mZE-WGGqKHnowwM0MnoRuKMN4iEz-gue63ro2FIk" "user" 2.0)
+
+; kryptomerch:mR2mZE-WGGqKHnowwM0MnoRuKMN4iEz-gue63ro2FIk
+(commit-tx)
+
+(begin-tx)
+(use kip.token-manifest)
+(use free.mtest3)
+(use free.mpolicy3)
+(env-keys ["copper" "user"])
+
+(env-data {
+  "free.merchpolicyone-admin-ks":{"keys":["copper"],"pred":"keys-all"},
+  'user-ks: {"keys": ["user"], "pred": "keys-all"}
+  })
+; (chain-data)
+; (env-chain-data {"block-time": (parse-time "%F" "1970-01-04")})
+(test-capability (coin.TRANSFER "user1" "merchcreator" 2.0))
+(test-capability (free.mtest3.MINT-MERCH "user1" 1.0))
+; (mint-bulk-merch "user1" (read-keyset 'user-ks) 1.0 "merch" 1)
+(end-mint)
+(get-total-supply)
+(get-mint-status)
+(commit-tx)
+
+(begin-tx "OFFER")
+(use free.mtest3)
+(use free.mpolicy3)
+
+(env-data
+ {
+  "quote": {
+      "price": 10.0
+     ,"recipient": "user"
+     ,"recipient-guard": {"keys": ["user"], "pred":"keys-all"}
+   }
+ ,"buyer": "coin-buyer"
+ ,"buyer-guard": {"keys": ["buyer"], "pred": "keys-all"},
+ 'token: "kryptomerch:mR2mZE-WGGqKHnowwM0MnoRuKMN4iEz-gue63ro2FIk"
+ })
+(env-sigs
+ [{'key:'user
+  ,'caps:
+   [(free.mtest3.OFFER (read-msg 'token) "user" 1.0 120)]}
+])
+(test-capability (coin.COINBASE))
+
+(expect "coinbase buyer" "Write succeeded"
+ (coin.coinbase "coin-buyer" (read-msg 'buyer-guard) 12.0))
+
+(coin.get-balance 'coin-buyer)
+
+  (sale-call (read-msg 'token) 'user 1.0 120)
+  (print "usr-blnc")
+  (coin.get-balance 'user)
+
+
+   (print "pactid")
+   (sale-account)
+
+
+    (map (get-balance (read-msg 'token)) ['user (sale-account)])
+
+   ; (expect "OFFER events"
+   ;   [{"name": "free.mtest3.OFFER","params": [(read-msg 'token) "user" 1.0 120]},
+   ;    {"name": "free.mtest3.SALE","params": [(read-msg 'token) "user" 1.0 120 (pact-id)]},
+   ;    {"name": "free.mpolicy3.QUOTE","params": [(pact-id) (read-msg 'token) 1.0 10.0 10.0 1.000000000000 "creator" (read-msg "quote")]},
+   ;    {"name": "free.mtest3.ACCOUNT_GUARD","params": [(read-msg 'token) (sale-account) (create-pact-guard "SALE")]},
+   ;    {"name": "free.mtest3.TRANSFER","params": [(read-msg 'token) "user" (sale-account) 1.0]},
+   ;    {"name": "free.mtest3.RECONCILE","params": [(read-msg 'token) 1.0
+   ;    { "account": "user",
+   ;      "current": 0.0,
+   ;      "previous": 1.0
+   ;    }  { "account": (sale-account),
+   ;      "current": 1.0,
+   ;      "previous": 0.0
+   ;      }]}]
+   ;  (map (remove 'module-hash) (env-events true)))
+(coin.get-balance 'coin-buyer)
+   (env-sigs [
+    {'key: 'user
+     ,'caps: [    (free.mtest3.BUY "kryptomerch:mR2mZE-WGGqKHnowwM0MnoRuKMN4iEz-gue63ro2FIk" "user" "coin-buyer" 1.0 120 "DldRwCblQ7Loqy6wYJnaodHl30d3j3eH-qtFzfEv46g")]
+    }
+   ,{'key: 'buyer
+   ,'caps: [
+    (coin.TRANSFER "coin-buyer" "user" 9.0)
+    (coin.TRANSFER "coin-buyer" "merchcreator3" 1.0)
+    (free.mpolicy3.BUY (read-msg 'token) "coin-buyer")
+   ]}])
+
+   (map (coin.get-balance ) ['coin-buyer 'user 'creator])
+
+    (continue-pact 1)
+
+    (map (get-balance (read-msg 'token)) ['user (sale-account) 'coin-buyer])
+
+
+    (map (coin.get-balance ) ['coin-buyer 'user 'creator])
+
+   (expect-failure "Withdraw fails after sale completes"
+    (format "pact completed: {}" [(pact-id)])
+    (continue-pact 0 true))
+
+   ; (expect "BUY events"
+   ;   [{"name": "free.mtest3.BUY","params": [(read-msg 'token) "user" "coin-buyer" 1.0 120 (pact-id)]},
+   ;    {"name": "coin.TRANSFER","params": ["coin-buyer" "creator" 1.000000000000]},
+   ;    {"name": "coin.TRANSFER","params": ["coin-buyer" "user" 9.000000000000]},
+   ;    {"name": "free.mtest3.ACCOUNT_GUARD","params": [(read-msg 'token) 'coin-buyer (read-keyset 'buyer-guard)]},
+   ;    {"name": "free.mtest3.TRANSFER","params": [(read-msg 'token) (sale-account) "coin-buyer" 1.0]},
+   ;    {"name": "free.mtest3.RECONCILE","params": [(read-msg 'token) 1.0
+   ;    { "account": (sale-account),
+   ;      "current": 0.0,
+   ;      "previous": 1.0
+   ;    }  { "account": "coin-buyer",
+   ;      "current": 1.0,
+   ;      "previous": 0.0
+   ;      }]}]
+   ;  (map (remove 'module-hash) (env-events true)))
+
+   (get-tokens-owned "coin-buyer")
+    (rollback-tx)

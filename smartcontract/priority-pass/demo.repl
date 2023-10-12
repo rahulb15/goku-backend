@@ -1,0 +1,15 @@
+(begin-tx)
+(define-namespace "free" (sig-keyset) (sig-keyset))
+(env-keys ["pass"])
+(env-data {
+  "r":{"keys":["pass"],"pred":"keys-all"}
+  })
+  (load "demo.pact")
+
+(commit-tx)
+(begin-tx)
+(use free.random)
+(return "abc")
+(upt "abc" 10.0 ["x","y","z"])
+(return "abc")
+(commit-tx)

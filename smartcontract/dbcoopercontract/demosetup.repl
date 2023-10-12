@@ -1,0 +1,13 @@
+(begin-tx)
+(define-namespace "free" (sig-keyset) (sig-keyset))
+(env-keys ["cooper"])
+(env-data {
+  "aryacontract-ks":{"keys":["cooper"],"pred":"keys-all"}
+  })
+(load "democontarct.pact")
+(commit-tx)
+
+(begin-tx)
+(use free.printchaindata)
+(printchaindata)
+(commit-tx)

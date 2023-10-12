@@ -1,0 +1,209 @@
+(begin-tx)
+(define-namespace "free" (sig-keyset) (sig-keyset))
+(define-namespace "kip" (sig-keyset) (sig-keyset))
+(define-namespace "util" (sig-keyset) (sig-keyset))
+(env-keys ["pass" "copper" "creator"])
+(env-data {
+  "pass-ks":{"keys":["pass"],"pred":"keys-all"},
+  "passadmin-ks":{"keys":["pass"],"pred":"keys-all"},
+  "coin-guard":{"keys":["pass"],"pred":"keys-all"},
+  "pass-ks":{"keys":["pass"],"pred":"keys-all"},
+  "marmalade-admin":{"keys":["pass"],"pred":"keys-all"},
+  "util-ks":{"keys":["pass"],"pred":"keys-all"}
+  })
+
+(load "manifest.pact")
+(load "pass-token-policy-v1.pact")
+(load "util.guards.pact")
+(load "fungible-xchain-v1.pact")
+(load "fungible-v2.pact")
+
+(load "coin.pact")
+(load "pass-fungible-v2.pact")
+(load "kip.account-protocols-v1.pact")
+(load "util.fungible-util.pact")
+(load "pass.pact")
+(load "duplicate-prioritypass-policy.pact")
+(commit-tx)
+
+(begin-tx "creating collection")
+(use free.priority-pass)
+(use free.pass-policy)
+(use free.pass-fungible)
+(use kip.token-manifest)
+(env-data {
+   'creator: "creator",
+   'user: "user",
+   'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+   'user-ks: {"keys": ["user"], "pred": "keys-all"},
+   ; "token_spec": {
+   ;   'fungible: coin,
+   ;   'creator: "creator",
+   ;   'creator-guard: {"keys": ["creator"], "pred": "keys-all"},
+   ;   'owner: "creator",
+   ;   "royalty-rate": 0.1
+   ;   },
+     "tokens-list": ["OnaCvrAsM53g1QOVaAFkw6DcGpQ6vWYn6tBL8stUFSA", "ypHr-r69c8ux1DcBn5RZiuX5oWYELwidXDnxNL9VT5I", "S4SMB4o64QzXe5rD3tbYtGCVoVbfn5a0OWUZD5JrQP4", "gD4YpDuxaTpA83_7Rdp1xXzdiYqmgjAv4No3VwxQs8M", "AILSceqfauxaTpA83_7Rdp1xXzdiYqmgjAv4No3Vwaffaa", "WXWtMhRIAiyZU7zuIdbAneIbvmy-eUoCq2CM1_kB4N0"],
+     "provenance": "asjnasf",
+     "collection": {
+      'name: "PASS",
+      'symbol: "PP",
+      'total-supply: 1000,
+      'creator: "collection",
+      'policy: free.pass-policy,
+      'guard: {"keys": ["collection"], "pred": "keys-all"},
+      'token: {
+          'id: "",
+          'manifest: (create-manifest (uri "text" "") []),
+          'precision: 0,
+          'supply: 1.0
+          }
+          },
+     'name: "PASS",
+     'fungible: free.pass-fungible,
+     'price-per-nft: 2.0,
+     'max-per-user: 2,
+     'max-per-tx:1,
+     'total-supply: 6,
+     'total-supply1: 1000
+  })
+
+  (expect "create creator account " "Write succeeded"
+  (free.coin.create-account "creator" (read-keyset 'creator-guard) ))
+
+(expect "create user account " "Write succeeded"
+(free.coin.create-account "user" (read-keyset 'user-ks) ))
+
+ (test-capability (free.coin.COINBASE))
+
+   (expect "coinbase buyer" "Write succeeded"
+   (free.coin.coinbase "user" (read-keyset 'user-ks) 10.0))
+
+   (expect "create user account " "Write succeeded"
+   (free.coin.create-account "user1" (read-keyset 'user-ks) ))
+
+    (test-capability (free.coin.COINBASE))
+
+      (expect "coinbase buyer" "Write succeeded"
+      (free.coin.coinbase "user1" (read-keyset 'user-ks) 2.0))
+
+(commit-tx)
+
+(begin-tx)
+
+(use free.priority-pass)
+(use free.pass-policy)
+(use kip.token-manifest)
+
+
+(initialize
+  (read-msg 'provenance)
+  (read-msg 'tokens-list)
+  (read-msg 'creator)
+  (read-msg 'creator-guard)
+  (read-integer 'total-supply)
+  (read-integer 'max-per-user)
+  (read-integer 'max-per-tx)
+  (read-msg 'price-per-nft)
+  (read-msg 'name)
+  )
+
+;(test-capability (MERCH))
+  (expect "Create token Collection"
+    true
+    (create-collection (read-msg 'collection)))
+
+(get-collection "PASS")
+
+(commit-tx)
+
+
+(begin-tx)
+(use free.priority-pass)
+(use free.pass-policy)
+(use kip.token-manifest)
+(env-data {
+  "creator-guard": {"keys": ["collection"], "pred": "keys-all"},
+  "collection": {"keys": ["pass"], "pred": "keys-all"},
+  'user-ks: {"keys": ["user"], "pred": "keys-all"}
+
+
+  })
+
+(create-token
+  "PASS #1"
+  1
+  (create-manifest (uri "pass1" "Dummy token-uri") [])
+  free.pass-policy
+  "PASS"
+  )
+
+(print "infor")
+(get-policy-info "PASS #1")
+(test-capability (PRIVATE))
+(test-capability (CREDIT "PASS #1" "user"))
+(test-capability (CREDIT-MERCH "user"))
+(test-capability (free.coin.TRANSFER "user" "creator" 2.0))
+(mint-pass "user" (read-keyset 'user-ks) 1.0 "PASS" 1)
+
+
+(get-account-minted "user")
+(get-tokens-owned "user")
+(get-passbalance "user")
+(env-data {
+  'pass-ks: {"keys": ["user"], "pred": "keys-all"}
+  })
+
+(test-capability (MERCH))
+(burn "user")
+(get-passbalance "user")
+
+
+(commit-tx)
+
+(begin-tx "second token")
+(use free.priority-pass)
+(use free.pass-policy)
+(use kip.token-manifest)
+
+(env-data {
+  "creator-guard": {"keys": ["collection"], "pred": "keys-all"},
+  "collection": {"keys": ["pass"], "pred": "keys-all"},
+  'user-ks: {"keys": ["user"], "pred": "keys-all"}
+
+
+  })
+(create-token
+  "PASS #2"
+  2
+  (create-manifest (uri "pass1" "Dummy token-uri") [])
+  free.pass-policy
+  "PASS"
+  )
+
+(print "token-2")
+(get-policy-info "PASS #2")
+(test-capability (PRIVATE))
+(test-capability (CREDIT "PASS #2" "user"))
+(test-capability (CREDIT-MERCH "user"))
+(test-capability (free.coin.TRANSFER "user" "creator" 2.0))
+
+(test-capability (MINT-PASS "user" 4.0))
+(mint-bulk-pass "user" (read-keyset 'user-ks) 4.0 "PASS" 1)
+
+
+(get-account-minted "user")
+(get-tokens-owned "user")
+(get-passbalance "user")
+(env-data {
+  'pass-ks: {"keys": ["user"], "pred": "keys-all"}
+  })
+
+(test-capability (MERCH))
+(burn "user")
+(get-passbalance "user")
+
+
+
+
+(commit-tx)
