@@ -534,7 +534,11 @@ router.patch("/update-nft", async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
+      const updateNft1 = await NftSchema.findByIdAndUpdate(_id, updateObj, {
+        new: true,
+      });
     }
+    
 
     // Conditionally add newHistoryEntry to the update
     if (newHistoryEntry) {
@@ -651,6 +655,13 @@ router.patch("/update-nft-gift", async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
+      const findByTokenIdAndUpdate = await NftSchema.findOneAndUpdate(
+        { tokenId: tokenId },
+        updateObj,
+        {
+          new: true,
+        }
+      );
     }
 
     // Conditionally add newHistoryEntry to the update

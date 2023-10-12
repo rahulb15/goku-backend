@@ -128,6 +128,7 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       history,
       bidder,
       onAuction,
+      nftPrice,
     } = req.body;
     const { bidPrice } = req.body;
 
@@ -205,6 +206,7 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       onSale: onSale ? onSale : false,
       onAuction: onAuction ? onAuction : false,
       onMarketplace: onMarketplace ? onMarketplace : false,
+      nftPrice,
     };
     console.log(
       "OBJjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",
@@ -228,6 +230,10 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
+      // Update the document
+    const updatePass = await PassSchema.findByIdAndUpdate(_id, updateObj, {
+      new: true,
+    });
     }
 
     // Conditionally add newHistoryEntry to the update
@@ -344,6 +350,13 @@ router.patch("/update-nft-pass-gift", userAuthorization, async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
+      const findByTokenIdAndUpdate = await PassSchema.findOneAndUpdate(
+        { passTokenId: passTokenId }, // Filter object
+        updateObj,
+        {
+          new: true,
+        }
+      );
     }
 
     // Conditionally add newHistoryEntry to the update
@@ -498,6 +511,11 @@ router.patch("/update-nft-pass", userAuthorization, async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
+       // Update the document
+    const updateNft = await PassSchema.findByIdAndUpdate(_id, updateObj, {
+      new: true,
+    });
+
     }
 
     // Conditionally add newHistoryEntry to the update
@@ -568,6 +586,7 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
         date: new Date(), // Use the provided date or the current date
       };
     }
+    console.log("newHistoryEntry", newHistoryEntry);
 
     let newBidObj = null;
     if (onAuction) {
@@ -577,6 +596,7 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
         bidTime: new Date(),
       };
     }
+    console.log("newBidObj", newBidObj);
 
     const obj = {
       collectionName,
@@ -611,7 +631,13 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
+      const updateNft1 = await NftSchema.findByIdAndUpdate(_id, updateObj, {
+        new: true,
+      });
+  
     }
+    console.log("updateObj", updateObj);
+   
 
     // Conditionally add newHistoryEntry to the update
     if (newHistoryEntry) {
@@ -622,6 +648,8 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
         },
       };
     }
+
+    console.log("updateObj", updateObj);
 
     // Update the document
     const updateNft = await NftSchema.findByIdAndUpdate(_id, updateObj, {
