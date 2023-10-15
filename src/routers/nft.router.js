@@ -631,11 +631,11 @@ router.patch("/update-nft-gift", async (req, res) => {
 
     const obj = {
       creator,
-      imageIndex: imageIndex ? imageIndex : "",
+      // imageIndex: imageIndex ? imageIndex : "",
       onAuction: onAuction ? onAuction : false,
       // isRevealed:false,
       clientId: mongoose.Types.ObjectId(findUSer._id),
-      sellingType: sellingType ? sellingType : "",
+      sellingType: sellingType ? sellingType : "All",
       onMarketplace: onMarketplace ? onMarketplace : false,
       duration,
       creatorName: findUSer.name,

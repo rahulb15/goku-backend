@@ -13,6 +13,7 @@ const upload = multer({ dest: 'uploads/' })
 const mongoose = require("mongoose");
 var multipart = require('connect-multiparty');
 const multipartMiddleware = multipart();
+const { NftSchema } = require("../models/nfts/nft.schema");
 
 
 
@@ -125,16 +126,48 @@ router.get('/user-collection-by-id2',userAuthorization, async (req, res) => {
         //find collection by id and based on that find all nft
 
 
-        const collections = await CollectionSchema.aggregate([
+        const collections = await NftSchema.aggregate([
+
+            // find nft by collection id and calculate total nftPrice float and nftPrice is string so convert to number
+            { $match: { collectionId: mongoose.Types.ObjectId(id) } },
             {
-                $match: {
-                    $and: [{ _id: mongoose.Types.ObjectId(id) }],
+                $group: {
+                    _id: "$collectionId",
+                    totalNftPrice: { $sum: { $toDouble: "$nftPrice" } },
+                    totalNft: { $sum: 1 },
+                    minNftPrice: { $min: { $toDouble: "$nftPrice" } }, // Calculate the minimum price
+                    maxNftPrice: { $max: { $toDouble: "$nftPrice" } }, // Calculate the maximum price
                 },
             },
 
+            {
+                $lookup: {
+                    from: "collections", // other table name
+                    localField: "_id", // name of users table field
+                    foreignField: "_id", // name of userinfo table field
+                    as: "collection_info", // alias for userinfo table
+                },
+            },
+            {
+                $lookup: {
+                    from: "users", // other table name
+                    localField: "collection_info.clientId", // name of users table field
+                    foreignField: "_id", // name of userinfo table field
+                    as: "user_info", // alias for userinfo table
+                },
+            },
+            {
+                $project: {
+                    _id: 1,
+                    totalNftPrice: 1,
+                    totalNft: 1,
+                    collection_info: 1,
+                    user_info: 1,
+                    minNftPrice: 1,
+                    maxNftPrice: 1,
+                },
+            },
         ]);
-
-
 
         
         
