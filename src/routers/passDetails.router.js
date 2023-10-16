@@ -624,6 +624,7 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
     };
 
     // Conditionally add newBidObj to the update
+    console.log(newBidObj,"bidObj");
     if (newBidObj) {
       updateObj.$push = {
         bidInfo: {
@@ -631,6 +632,7 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
+    console.log(updateObj,"updateObj1");
       const updateNft1 = await NftSchema.findByIdAndUpdate(_id, updateObj, {
         new: true,
       });
@@ -666,6 +668,134 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
     res.json({ status: "error", message: error.message });
   }
 });
+
+
+
+router.patch("/bidding-pass", userAuthorization, async (req, res) => {
+  try {
+    const {
+      _id,
+      bidder,
+      collectionName,
+      tokenId,
+      creator,
+      tokenImage,
+      revealed,
+      hash,
+      imageIndex,
+      onMarketplace,
+      sellingType,
+      nftPrice,
+      duration,
+      onSale,
+      onAuction,
+      history,
+    } = req.body;
+    const { bidPrice } = req.body;
+
+    let newHistoryEntry = null;
+
+    if (
+      history?.category == "bid" ||
+      history?.category == "buy" ||
+      history?.category == "sale" ||
+      history?.category == "transfer" ||
+      history?.category == "auction" ||
+      history?.category == "mint" ||
+      history?.category == "cancelAuction" ||
+      history?.category == "closeSale" ||
+      history?.category == "cancelBid"
+    ) {
+      newHistoryEntry = {
+        owner: history.owner,
+        price: history.price,
+        category: history.category,
+        date: new Date(), // Use the provided date or the current date
+      };
+    }
+    console.log("newHistoryEntry", newHistoryEntry);
+
+    let newBidObj = null;
+    if (onAuction) {
+      newBidObj = {
+        bidPrice,
+        bidder: bidder,
+        bidTime: new Date(),
+      };
+    }
+    console.log("newBidObj", newBidObj);
+
+    const obj = {
+      collectionName,
+      tokenId,
+      creator,
+      tokenImage,
+      revealed: revealed,
+      hash,
+      imageIndex,
+      onMarketplace: onMarketplace ? onMarketplace : false,
+      sellingType,
+      duration,
+      onSale: onSale ? onSale : false,
+      onAuction: onAuction ? onAuction : false,
+    };
+    
+
+    
+    const id = req.userId;
+    
+    //Create an update object based on the presence of newBidObj
+    const updateObj = {
+      $set: obj, // Add the 'obj' to the update
+    };
+
+    // Conditionally add newBidObj to the update
+    console.log(newBidObj,"bidObj");
+    if (newBidObj) {
+      updateObj.$push = {
+        bidInfo: {
+          $each: [newBidObj],
+          $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
+        },
+      };
+    console.log(updateObj,"updateObj1");
+      const updateNft1 = await PassSchema.findByIdAndUpdate(_id, updateObj, {
+        new: true,
+      });
+  
+    }
+    console.log("updateObj", updateObj);
+   
+
+    // Conditionally add newHistoryEntry to the update
+    if (newHistoryEntry) {
+      updateObj.$push = {
+        history: {
+          $each: [newHistoryEntry],
+          $sort: { date: -1 }, // Sort in descending order based on bidTime
+        },
+      };
+    }
+
+    console.log("updateObj", updateObj);
+
+    // Update the document
+    const updateNft = await PassSchema.findByIdAndUpdate(_id, updateObj, {
+      new: true,
+    });
+
+    
+
+    return res.json({
+      status: "success",
+      data: updateNft,
+    });
+  } catch (error) {
+    res.json({ status: "error", message: error.message });
+  }
+});
+
+
 
 //show all nfts bids only on auction
 router.post("/all-nft-bids", userAuthorization, async (req, res) => {
@@ -706,7 +836,53 @@ router.post("/all-nft-bids", userAuthorization, async (req, res) => {
   } catch (error) {
     res.json({ status: "error", message: error.message });
   }
+
 });
+
+router.post("/all-nft-bids-pass", userAuthorization, async (req, res) => {
+  try {
+    const { _id } = req.body;
+    
+    // Sort in descending order based on bidTime and add the new bid to the beginning of the array
+    const updateNft = await PassSchema.aggregate([
+      { $match: { _id: mongoose.Types.ObjectId(_id) } },
+      {
+        $project: {
+          _id: 1,
+          bidInfo: 1,
+          nftPrice: 1,
+          tokenId: 1,
+          history: 1,
+        },
+      },
+      {
+        $unwind: "$bidInfo",
+      },
+      {
+        $group: {
+          _id: "$_id",
+          bidInfo: { $push: "$bidInfo" },
+          nftPrice: { $first: "$nftPrice" },
+          tokenId: { $first: "$tokenId" },
+          history: { $first: "$history" },
+        },
+      },
+    ]);
+    
+
+    return res.json({
+      status: "success",
+      data: updateNft,
+    });
+  } catch (error) {
+    res.json({ status: "error", message: error.message });
+  }
+});
+
+
+
+
+
 
 router.post("/user-pass-category", userAuthorization, async (req, res) => {
   try {
