@@ -44,6 +44,22 @@ royaltyFee :{
 royaltyAddress:{
     type:String
 },
+totalNftPrice:{
+    type:Number,
+    default:0
+},
+totalNft:{
+    type:Number,
+    default:0
+},
+minNftPrice :{
+    type:Number,
+    default:0
+},
+maxNftPrice :{
+    type:Number,
+    default:0
+},
 createdDate: {
   type: Date,
 },

@@ -335,7 +335,8 @@ router.get("/all-users-nft-hot-collections-1", async (req, res) => {
       $project: {
         _id: "$collection._id",
         name: "$collection.collectionName",
-        description: "$collection.description",
+        minNftPrice: "$collection.minNftPrice",
+        totalNftPrice: "$collection.totalNftPrice",
         image: "$collection.imageUrl",
         nft: "$nft",
       },
@@ -586,7 +587,7 @@ router.patch("/update-nft-gift", async (req, res) => {
 
     //find creator in user table
     const findUSer = await UserSchema.findOne({ walletAddress: creator });
-    
+    console.log("findUSer", findUSer);
 
     //if user not found then delete nft
     if (!findUSer) {

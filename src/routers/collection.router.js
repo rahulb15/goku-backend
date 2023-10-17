@@ -184,6 +184,274 @@ router.get('/user-collection-by-id2',userAuthorization, async (req, res) => {
     }
 });
 
+//get all collection isActive true
+router.post('/all-users-collection-active', async (req, res) => {
+    try {
+       
+        const search = req.body.search ? req.body.search : "";
+        console.log("search",search)
+        const page = parseInt(req.query.page);
+        const limit = parseInt(req.query.limit);
+  
+  
+        const startIndex = (page - 1) * limit;
+        const endIndex = page * limit;
+        const sort = { createdAt: -1 };
+        const results = {};
+  
+        if (endIndex < (await CollectionSchema.countDocuments().exec())) {
+          results.next = {
+            page: parseInt(page) + 1,
+            limit: limit,
+          };
+        }
+  
+        if (startIndex > 0) {
+          results.previous = {
+            page: parseInt(page) - 1,
+            limit: limit,
+          };
+        }
+  
+        const count = await CollectionSchema.countDocuments({
+            isActive: true,
+            collectionName: { $regex: search, $options: "i" },
+            }).exec();
+  
+        const allActiveCollection = await CollectionSchema.find({
+            isActive: true,
+            collectionName: { $regex: search, $options: "i" },
+            })
+          .sort(sort)
+          .limit(limit * 1)
+          .skip(startIndex)
+          .exec();
+
+          console.log("allActiveCollection",allActiveCollection)
+
+          allActiveCollection.forEach(async (element) => {
+            const id = element._id;
+            const collections = await NftSchema.aggregate([
+
+                // find nft by collection id and calculate total nftPrice float and nftPrice is string so convert to number
+                { $match: { collectionId: mongoose.Types.ObjectId(id) } },
+                {
+                    $group: {
+                        _id: "$collectionId",
+                        totalNftPrice: { $sum: { $toDouble: "$nftPrice" } },
+                        totalNft: { $sum: 1 },
+                        minNftPrice: { $min: { $toDouble: "$nftPrice" } }, // Calculate the minimum price
+                        maxNftPrice: { $max: { $toDouble: "$nftPrice" } }, // Calculate the maximum price
+                    },
+                },
+    
+                {
+                    $lookup: {
+                        from: "collections", // other table name
+                        localField: "_id", // name of users table field
+                        foreignField: "_id", // name of userinfo table field
+                        as: "collection_info", // alias for userinfo table
+                    },
+                },
+                {
+                    $lookup: {
+                        from: "users", // other table name
+                        localField: "collection_info.clientId", // name of users table field
+                        foreignField: "_id", // name of userinfo table field
+                        as: "user_info", // alias for userinfo table
+                    },
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        totalNftPrice: 1,
+                        totalNft: 1,
+                        collection_info: 1,
+                        user_info: 1,
+                        minNftPrice: 1,
+                        maxNftPrice: 1,
+                    },
+                },
+            ]);
+            console.log("collections===========================",collections)
+            if (collections.length > 0) {
+                // element.totalNftPrice = collections[0].totalNftPrice;
+                // element.totalNft = collections[0].totalNft;
+                // element.minNftPrice = collections[0].minNftPrice;
+                // element.maxNftPrice = collections[0].maxNftPrice;
+                //update collection with totalNftPrice,totalNft,minNftPrice,maxNftPrice
+                const updateCollection = await CollectionSchema.updateOne(
+                    { _id: id },
+                    {
+                        $set: {
+                            totalNftPrice: collections[0].totalNftPrice,
+                            totalNft: collections[0].totalNft,
+                            minNftPrice: collections[0].minNftPrice,
+                            maxNftPrice: collections[0].maxNftPrice,
+                        },
+                    },
+                    { new: true }
+                );
+
+                console.log("updateCollection",updateCollection)
+            }
+            }
+            );
+
+            console.log("allActiveCollection",allActiveCollection)
+
+
+
+
+        
+            return res.json({
+                status: "success",data:allActiveCollection,count:count
+                
+            });
+       
+        
+    } catch (error) {
+        res.json({ status: 'error', message: error.message });
+    }
+});
+
+
+
+router.get('/user-collection-1',userAuthorization, async (req, res) => {
+      
+        try {
+            const id = req.userId;
+            console.log("csc",id)
+            const search = req.body.search ? req.body.search : "";
+            console.log("search",search)
+            const page = parseInt(req.query.page);
+            const limit = parseInt(req.query.limit);
+      
+      
+            const startIndex = (page - 1) * limit;
+            const endIndex = page * limit;
+            const sort = { createdAt: -1 };
+            const results = {};
+      
+            if (endIndex < (await CollectionSchema.countDocuments().exec())) {
+              results.next = {
+                page: parseInt(page) + 1,
+                limit: limit,
+              };
+            }
+      
+            if (startIndex > 0) {
+              results.previous = {
+                page: parseInt(page) - 1,
+                limit: limit,
+              };
+            }
+      
+            const count = await CollectionSchema.countDocuments({
+                clientId:id,
+                collectionName: { $regex: search, $options: "i" },
+                }).exec();
+      
+            const allActiveCollection = await CollectionSchema.find({
+                clientId:id,
+                collectionName: { $regex: search, $options: "i" },
+                })
+              .sort(sort)
+              .limit(limit * 1)
+              .skip(startIndex)
+              .exec();
+    
+              console.log("allActiveCollection",allActiveCollection)
+    
+              allActiveCollection.forEach(async (element) => {
+                const id = element._id;
+                const collections = await NftSchema.aggregate([
+    
+                    // find nft by collection id and calculate total nftPrice float and nftPrice is string so convert to number
+                    { $match: { collectionId: mongoose.Types.ObjectId(id) } },
+                    {
+                        $group: {
+                            _id: "$collectionId",
+                            totalNftPrice: { $sum: { $toDouble: "$nftPrice" } },
+                            totalNft: { $sum: 1 },
+                            minNftPrice: { $min: { $toDouble: "$nftPrice" } }, // Calculate the minimum price
+                            maxNftPrice: { $max: { $toDouble: "$nftPrice" } }, // Calculate the maximum price
+                        },
+                    },
+        
+                    {
+                        $lookup: {
+                            from: "collections", // other table name
+                            localField: "_id", // name of users table field
+                            foreignField: "_id", // name of userinfo table field
+                            as: "collection_info", // alias for userinfo table
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: "users", // other table name
+                            localField: "collection_info.clientId", // name of users table field
+                            foreignField: "_id", // name of userinfo table field
+                            as: "user_info", // alias for userinfo table
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            totalNftPrice: 1,
+                            totalNft: 1,
+                            collection_info: 1,
+                            user_info: 1,
+                            minNftPrice: 1,
+                            maxNftPrice: 1,
+                        },
+                    },
+                ]);
+                console.log("collections===========================",collections)
+                if (collections.length > 0) {
+                    // element.totalNftPrice = collections[0].totalNftPrice;
+                    // element.totalNft = collections[0].totalNft;
+                    // element.minNftPrice = collections[0].minNftPrice;
+                    // element.maxNftPrice = collections[0].maxNftPrice;
+                    //update collection with totalNftPrice,totalNft,minNftPrice,maxNftPrice
+                    const updateCollection = await CollectionSchema.updateOne(
+                        { _id: id },
+                        {
+                            $set: {
+                                totalNftPrice: collections[0].totalNftPrice,
+                                totalNft: collections[0].totalNft,
+                                minNftPrice: collections[0].minNftPrice,
+                                maxNftPrice: collections[0].maxNftPrice,
+                            },
+                        },
+                        { new: true }
+                    );
+    
+                    console.log("updateCollection",updateCollection)
+                }
+                }
+                );
+    
+                console.log("allActiveCollection",allActiveCollection)
+    
+    
+    
+    
+            
+                return res.json({
+                    status: "success",data:allActiveCollection,count:count
+                    
+                });
+           
+            
+        } catch (error) {
+            res.json({ status: 'error', message: error.message });
+        }
+});
+
+
+
+
 
 
 
@@ -214,7 +482,6 @@ router.post('/user-collection-category', async (req, res) => {
     try {
         const {tab}=req.body
         const id = req.userId;
-        console.log("csc",id)
         // const result = await getAllPasses();
 		const user=await getCollectionByTab(tab)
 	
@@ -231,6 +498,136 @@ router.post('/user-collection-category', async (req, res) => {
     } catch (error) {
         res.json({ status: 'error', message: error.message });
     }
+});
+
+router.post('/user-collection-category-1', async (req, res) => {
+        try {
+            const {tab}=req.body
+            const search = req.body.search ? req.body.search : "";
+            console.log("search",search)
+            const page = parseInt(req.query.page);
+            const limit = parseInt(req.query.limit);
+      
+      
+            const startIndex = (page - 1) * limit;
+            const endIndex = page * limit;
+            const sort = { createdAt: -1 };
+            const results = {};
+      
+            if (endIndex < (await CollectionSchema.countDocuments().exec())) {
+              results.next = {
+                page: parseInt(page) + 1,
+                limit: limit,
+              };
+            }
+      
+            if (startIndex > 0) {
+              results.previous = {
+                page: parseInt(page) - 1,
+                limit: limit,
+              };
+            }
+      
+            const count = await CollectionSchema.countDocuments({
+                category:tab,
+                collectionName: { $regex: search, $options: "i" },
+                }).exec();
+      
+            const allActiveCollection = await CollectionSchema.find({
+                category:tab,
+                collectionName: { $regex: search, $options: "i" },
+                })
+              .sort(sort)
+              .limit(limit * 1)
+              .skip(startIndex)
+              .exec();
+    
+              console.log("allActiveCollection",allActiveCollection)
+    
+              allActiveCollection.forEach(async (element) => {
+                const id = element._id;
+                const collections = await NftSchema.aggregate([
+    
+                    // find nft by collection id and calculate total nftPrice float and nftPrice is string so convert to number
+                    { $match: { collectionId: mongoose.Types.ObjectId(id) } },
+                    {
+                        $group: {
+                            _id: "$collectionId",
+                            totalNftPrice: { $sum: { $toDouble: "$nftPrice" } },
+                            totalNft: { $sum: 1 },
+                            minNftPrice: { $min: { $toDouble: "$nftPrice" } }, // Calculate the minimum price
+                            maxNftPrice: { $max: { $toDouble: "$nftPrice" } }, // Calculate the maximum price
+                        },
+                    },
+        
+                    {
+                        $lookup: {
+                            from: "collections", // other table name
+                            localField: "_id", // name of users table field
+                            foreignField: "_id", // name of userinfo table field
+                            as: "collection_info", // alias for userinfo table
+                        },
+                    },
+                    {
+                        $lookup: {
+                            from: "users", // other table name
+                            localField: "collection_info.clientId", // name of users table field
+                            foreignField: "_id", // name of userinfo table field
+                            as: "user_info", // alias for userinfo table
+                        },
+                    },
+                    {
+                        $project: {
+                            _id: 1,
+                            totalNftPrice: 1,
+                            totalNft: 1,
+                            collection_info: 1,
+                            user_info: 1,
+                            minNftPrice: 1,
+                            maxNftPrice: 1,
+                        },
+                    },
+                ]);
+                console.log("collections===========================",collections)
+                if (collections.length > 0) {
+                    // element.totalNftPrice = collections[0].totalNftPrice;
+                    // element.totalNft = collections[0].totalNft;
+                    // element.minNftPrice = collections[0].minNftPrice;
+                    // element.maxNftPrice = collections[0].maxNftPrice;
+                    //update collection with totalNftPrice,totalNft,minNftPrice,maxNftPrice
+                    const updateCollection = await CollectionSchema.updateOne(
+                        { _id: id },
+                        {
+                            $set: {
+                                totalNftPrice: collections[0].totalNftPrice,
+                                totalNft: collections[0].totalNft,
+                                minNftPrice: collections[0].minNftPrice,
+                                maxNftPrice: collections[0].maxNftPrice,
+                            },
+                        },
+                        { new: true }
+                    );
+    
+                    console.log("updateCollection",updateCollection)
+                }
+                }
+                );
+    
+                console.log("allActiveCollection",allActiveCollection)
+    
+    
+    
+    
+            
+                return res.json({
+                    status: "success",data:allActiveCollection,count:count
+                    
+                });
+           
+            
+        } catch (error) {
+            res.json({ status: 'error', message: error.message });
+        }
 });
 
 
