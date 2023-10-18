@@ -336,6 +336,7 @@ router.get("/all-users-nft-hot-collections-1", async (req, res) => {
         _id: "$collection._id",
         name: "$collection.collectionName",
         minNftPrice: "$collection.minNftPrice",
+        totalNftUser: "$collection.totalNftUser",
         totalNftPrice: "$collection.totalNftPrice",
         image: "$collection.imageUrl",
         nft: "$nft",

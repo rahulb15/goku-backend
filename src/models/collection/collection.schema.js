@@ -60,6 +60,10 @@ maxNftPrice :{
     type:Number,
     default:0
 },
+totalNftUser:{
+    type:Number,
+    default:0
+},
 createdDate: {
   type: Date,
 },

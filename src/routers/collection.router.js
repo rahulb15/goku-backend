@@ -135,6 +135,8 @@ router.get('/user-collection-by-id2',userAuthorization, async (req, res) => {
                     _id: "$collectionId",
                     totalNftPrice: { $sum: { $toDouble: "$nftPrice" } },
                     totalNft: { $sum: 1 },
+                    // totalNftSold: { $sum: { $cond: [{ $eq: ["$isSold", true] }, 1, 0] } },
+                    totalNftUser: { $addToSet: "$clientId" },
                     minNftPrice: { $min: { $toDouble: "$nftPrice" } }, // Calculate the minimum price
                     maxNftPrice: { $max: { $toDouble: "$nftPrice" } }, // Calculate the maximum price
                 },
@@ -161,6 +163,8 @@ router.get('/user-collection-by-id2',userAuthorization, async (req, res) => {
                     _id: 1,
                     totalNftPrice: 1,
                     totalNft: 1,
+                    // totalNftSold: 1,
+                    totalNftUser: { $size: "$totalNftUser" },
                     collection_info: 1,
                     user_info: 1,
                     minNftPrice: 1,
@@ -240,6 +244,7 @@ router.post('/all-users-collection-active', async (req, res) => {
                         _id: "$collectionId",
                         totalNftPrice: { $sum: { $toDouble: "$nftPrice" } },
                         totalNft: { $sum: 1 },
+                        totalNftUser: { $addToSet: "$clientId" },
                         minNftPrice: { $min: { $toDouble: "$nftPrice" } }, // Calculate the minimum price
                         maxNftPrice: { $max: { $toDouble: "$nftPrice" } }, // Calculate the maximum price
                     },
@@ -266,6 +271,7 @@ router.post('/all-users-collection-active', async (req, res) => {
                         _id: 1,
                         totalNftPrice: 1,
                         totalNft: 1,
+                        totalNftUser: { $size: "$totalNftUser" },
                         collection_info: 1,
                         user_info: 1,
                         minNftPrice: 1,
@@ -286,6 +292,7 @@ router.post('/all-users-collection-active', async (req, res) => {
                         $set: {
                             totalNftPrice: collections[0].totalNftPrice,
                             totalNft: collections[0].totalNft,
+                            totalNftUser: collections[0].totalNftUser,
                             minNftPrice: collections[0].minNftPrice,
                             maxNftPrice: collections[0].maxNftPrice,
                         },
@@ -374,6 +381,7 @@ router.get('/user-collection-1',userAuthorization, async (req, res) => {
                             _id: "$collectionId",
                             totalNftPrice: { $sum: { $toDouble: "$nftPrice" } },
                             totalNft: { $sum: 1 },
+                            totalNftUser: { $addToSet: "$clientId" },
                             minNftPrice: { $min: { $toDouble: "$nftPrice" } }, // Calculate the minimum price
                             maxNftPrice: { $max: { $toDouble: "$nftPrice" } }, // Calculate the maximum price
                         },
@@ -400,6 +408,7 @@ router.get('/user-collection-1',userAuthorization, async (req, res) => {
                             _id: 1,
                             totalNftPrice: 1,
                             totalNft: 1,
+                            totalNftUser: { $size: "$totalNftUser" },
                             collection_info: 1,
                             user_info: 1,
                             minNftPrice: 1,
@@ -420,6 +429,7 @@ router.get('/user-collection-1',userAuthorization, async (req, res) => {
                             $set: {
                                 totalNftPrice: collections[0].totalNftPrice,
                                 totalNft: collections[0].totalNft,
+                                totalNftUser: collections[0].totalNftUser,
                                 minNftPrice: collections[0].minNftPrice,
                                 maxNftPrice: collections[0].maxNftPrice,
                             },
@@ -555,6 +565,7 @@ router.post('/user-collection-category-1', async (req, res) => {
                             _id: "$collectionId",
                             totalNftPrice: { $sum: { $toDouble: "$nftPrice" } },
                             totalNft: { $sum: 1 },
+                            totalNftUser: { $addToSet: "$clientId" },
                             minNftPrice: { $min: { $toDouble: "$nftPrice" } }, // Calculate the minimum price
                             maxNftPrice: { $max: { $toDouble: "$nftPrice" } }, // Calculate the maximum price
                         },
@@ -581,6 +592,7 @@ router.post('/user-collection-category-1', async (req, res) => {
                             _id: 1,
                             totalNftPrice: 1,
                             totalNft: 1,
+                            totalNftUser: { $size: "$totalNftUser" },
                             collection_info: 1,
                             user_info: 1,
                             minNftPrice: 1,
@@ -601,6 +613,7 @@ router.post('/user-collection-category-1', async (req, res) => {
                             $set: {
                                 totalNftPrice: collections[0].totalNftPrice,
                                 totalNft: collections[0].totalNft,
+                                totalNftUser: collections[0].totalNftUser,
                                 minNftPrice: collections[0].minNftPrice,
                                 maxNftPrice: collections[0].maxNftPrice,
                             },
