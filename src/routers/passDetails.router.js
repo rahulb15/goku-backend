@@ -1010,6 +1010,68 @@ router.get("/all-nft-off-marketplace", userAuthorization, async (req, res) => {
   }
 });
 
+router.get("/all-nft-on-marketplace-dbcooper", async (req, res) => {
+  try {
+    
+    const clientId = req.userId;
+    const search = req.query.search ? req.query.search : "";
+    const page = req.query.page;
+    const limit = req.query.limit;
+    
+    
+    
+    
+
+    // s
+
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    const sort = { createdAt: -1 };
+    const results = {};
+
+    if (endIndex < (await PassSchema.countDocuments().exec())) {
+      results.next = {
+        page: parseInt(page) + 1,
+        limit: limit,
+      };
+    }
+
+    if (startIndex > 0) {
+      results.previous = {
+        page: parseInt(page) - 1,
+        limit: limit,
+      };
+    }
+
+    //count total documents if client id is given
+    const count = await PassSchema.countDocuments({
+      onMarketplace: true,
+      passName: "DB Cooper",
+      imageIndex: { $regex: search, $options: "i" },
+    }).exec();
+
+    //find by search and onMarketplace true and ClientId
+    const allNftOffMarketplace = await PassSchema.find({
+      onMarketplace: true,
+      passName: "DB Cooper",
+      imageIndex: { $regex: search, $options: "i" },
+    })
+      .sort(sort)
+      .limit(limit * 1)
+      .skip(startIndex)
+      .exec();
+    
+
+    return res.json({
+      status: "success",
+      data: allNftOffMarketplace,
+      count: count,
+    });
+  } catch (error) {
+    res.json({ status: "error", message: error.message });
+  }
+});
+
 //get user nft by onAuction true
 router.get("/user-nft-on-auction", userAuthorization, async (req, res) => {
   try {

@@ -851,6 +851,66 @@ const getAllNftOnAuction = () => {
   });
 };
 
+//get nft by id and for candle stick chart use history array for high,low,open,close
+const getNftByIdForCandleStickChart = async (nftId) => {
+  try {
+    const nftData = await NftSchema.aggregate([
+      {
+        $match: { _id: mongoose.Types.ObjectId(nftId) },
+      },
+      {
+        $project: {
+          _id: 0, // Exclude _id from the result
+          history: 1, // Include the 'history' array in the result
+        },
+      },
+      {
+        $unwind: '$history', // Unwind the 'history' array
+      },
+      {
+        $group: {
+          _id: null,
+          dates: { $push: '$history.date' },
+          opens: {
+            $push: {
+              $cond: [
+                { $eq: ['$history.category', 'mint'] }, // Check if 'category' is 'mint'
+                { $toDouble: '$history.price' }, // Set 'open' to 'price' if 'category' is 'mint'
+                null // Set 'open' to null if 'category' is not 'mint'
+              ],
+            },
+          },
+          highs: { $max: { $toDouble: '$history.price' } },
+          lows: { $min: { $toDouble: '$history.price' } },
+          closes: { $push: { $toDouble: '$history.price' } },
+        },
+      },
+    ]);
+
+    if (nftData.length === 0) {
+      return []; // NFT not found
+    }
+
+    // Extract the aggregated data
+    const candlestickData = nftData[0];
+
+    // Construct the final data format for the candlestick chart
+    const finalCandlestickData = candlestickData.dates.map((date, index) => ({
+      date: date,
+      open: candlestickData.opens[index],
+      high: candlestickData.highs,
+      low: candlestickData.lows,
+      close: candlestickData.closes[index],
+    }));
+
+    return finalCandlestickData;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
+
 // //get count all nft unique owner by client id
 // const getCountNftUniqueOwner = (clientId) => {
 // 	  return new Promise((resolve, reject) => {
@@ -981,7 +1041,8 @@ module.exports = {
   getUserNftMarketplaceTrueAllCollectionOnSale,
   getUserNftMarketplaceFalse,
   getUserNftMarketplaceTrueAll,
-  getNftByIdPass
+  getNftByIdPass,
+  getNftByIdForCandleStickChart,
   // getCountNftUniqueOwner,
   // addTotalNftPrice,
   // getBaseNftPrice

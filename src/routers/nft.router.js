@@ -24,6 +24,7 @@ const {
   getUserNftMarketplaceFalse,
   getAllNftOnAuction,
   getUserNftMarketplaceTrueAll,
+  getNftByIdForCandleStickChart,
   // getCountNftUniqueOwner,
   // addTotalNftPrice,
   // getBaseNftPrice,
@@ -216,6 +217,27 @@ router.post("/getNftbyId", async (req, res) => {
     res.json({ status: "error", message: error.message });
   }
 });
+
+router.post("/getNftByIdForCandleStickChart", async (req, res) => {
+  try {
+    const { _id } = req.body;
+
+    // const result = await getAllPasses();
+    const userNft = await getNftByIdForCandleStickChart(_id);
+
+
+    return res.json({
+      status: "success",
+      data: userNft,
+    });
+  } catch (error) {
+    res.json({ status: "error", message: error.message });
+  }
+});
+
+
+
+
 router.post("/getNftbyId2", async (req, res) => {
   try {
     const { _id } = req.body;
