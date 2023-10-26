@@ -67,6 +67,7 @@ totalNftUser:{
 createdDate: {
   type: Date,
 },
+
  
 });
 

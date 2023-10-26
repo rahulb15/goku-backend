@@ -1060,12 +1060,44 @@ router.get("/all-nft-on-marketplace-dbcooper", async (req, res) => {
       .limit(limit * 1)
       .skip(startIndex)
       .exec();
+
+        // Calculate the sum of nftPrice from the found documents
+    const nftPriceSum = allNftOffMarketplace.reduce((sum, nft) => {
+      // Convert nftPrice to a number and add it to the sum
+      return sum + parseFloat(nft.nftPrice);
+    }, 0);
+        // Use an aggregation pipeline to find the floor price
+    const aggregationPipeline = [
+      {
+        $match: {
+          onMarketplace: true,
+          passName: "DB Cooper",
+          imageIndex: { $regex: search, $options: "i" },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          floorPrice: { $min: { $toDouble: "$passCost" } },
+        },
+      },
+    ];
+
+    const floorPriceResult = await PassSchema.aggregate(aggregationPipeline);
+
+    // Extract the floorPrice from the result
+    const floorPrice = floorPriceResult.length > 0 ? floorPriceResult[0].floorPrice : 0;
+
+
+    console.log("nftPriceSum", nftPriceSum, "floorPrice", floorPrice);
     
 
     return res.json({
       status: "success",
       data: allNftOffMarketplace,
       count: count,
+      nftPriceSum: nftPriceSum,
+      passCostSum: floorPrice,
     });
   } catch (error) {
     res.json({ status: "error", message: error.message });

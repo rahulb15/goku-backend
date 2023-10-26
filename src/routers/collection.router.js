@@ -42,7 +42,7 @@ router.post("/saveCollection",userAuthorization,multipartMiddleware,  async (req
             clientId,
 			collectionName,
             tokenSymbol,
-            // collectionInfo,
+            collectionInfo,
             collectionUrl,
             category,
             totalSupply,

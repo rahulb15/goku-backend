@@ -27,10 +27,12 @@ const UserSchema = new Schema({
   },
   websiteUrl: {
     type: String,
+    default: "",
     
   },
   twitterUrl: {
     type: String,
+    default: "",
    
   },
   isActive : {
@@ -38,6 +40,15 @@ const UserSchema = new Schema({
     default: false,
   },
   InstagramUrl: {
+    type: String,
+    default: "",
+   
+  },
+  coverPhoto: {
+    type: String,
+   
+  },
+  profilePicture: {
     type: String,
    
   },
