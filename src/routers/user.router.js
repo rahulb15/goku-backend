@@ -171,6 +171,50 @@ router.get("/checkServer", async (req, res) => {
 router.patch(
   "/updateUser",
   userAuthorization,
+  async (req, res) => {
+    try {
+      console.log("hjh");
+      const _id = req.userId;
+      var {
+        name,
+        email,
+        userName,
+        shortBio,
+        websiteUrl,
+        twitterUrl,
+        InstagramUrl,
+      } = req.body;
+
+ 
+	  console.log(" _id", _id);
+
+      const userProf = await getUserById(_id);
+	  console.log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",userProf);
+      userProf.name = name ? name : userProf.name;
+      userProf.email = email ? email : userProf.email;
+      userProf.userName = userName ? userName : userProf.userName;
+      userProf.shortBio = shortBio ? shortBio : userProf.shortBio;
+      userProf.websiteUrl = websiteUrl ? websiteUrl : userProf.websiteUrl;
+      userProf.twitterUrl = twitterUrl ? twitterUrl : userProf.twitterUrl;
+      userProf.InstagramUrl = InstagramUrl
+        ? InstagramUrl
+        : userProf.InstagramUrl;
+
+      
+
+      const result = await insertUser(userProf);
+
+      res.json({ status: "success", message: "User has been Updated", result });
+    } catch (error) {
+      console.log(error);
+      res.json({ status: "error", message: error.message });
+    }
+  }
+);
+
+router.patch(
+  "/updateUser-profile",
+  userAuthorization,
   upload.fields([{ name: "coverPhoto" }, { name: "profilePicture" }]),
   async (req, res) => {
     try {
