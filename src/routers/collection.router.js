@@ -21,7 +21,7 @@ const { NftSchema } = require("../models/nfts/nft.schema");
 router.post("/saveCollection",userAuthorization,multipartMiddleware,  async (req, res) => {
 	console.log("ssc1")
     const clientId = req.userId;
-	const { collectionName,tokenSymbol,collectionInfo,collectionUrl,category,totalSupply,mintPrice, royaltyAddress, royaltyFee } = req.body;
+	const { collectionName,tokenSymbol,collectionInfo,collectionUrl,category,totalSupply,mintPrice, royaltyAddress, royaltyFee,bannerUrl } = req.body;
     console.log("ssc2",req.body)
     //tokenList to array
     const tokenList=req.body.tokenList.split(',')
@@ -44,6 +44,7 @@ router.post("/saveCollection",userAuthorization,multipartMiddleware,  async (req
             tokenSymbol,
             collectionInfo,
             collectionUrl,
+            bannerUrl,
             category,
             totalSupply,
             mintPrice,
@@ -100,7 +101,7 @@ router.get('/user-collection-by-id',userAuthorization, async (req, res) => {
         const id = req.query.id;
         console.log("csc",id)
         // const result = await getAllPasses();
-		const user=await CollectionSchema.find({ _id:id });
+		const user=await CollectionSchema.find({ _id:id }).populate("clientId");
 	
 
 	

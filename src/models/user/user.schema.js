@@ -10,6 +10,7 @@ const UserSchema = new Schema({
   userName: {
     type: String,
     maxlength: 50,
+    default: "",
 
   },
   email: {
@@ -23,6 +24,7 @@ const UserSchema = new Schema({
   },
   shortBio: {
     type: String,
+    default: "",
     
   },
   websiteUrl: {

@@ -314,6 +314,7 @@ router.get("/checkUser", userAuthorization, async (req, res) => {
 router.get("/userInfo", userAuthorization, async (req, res) => {
   try {
     const id = req.userId;
+    console.log("idsssssssssssssssssss", id);
     // const result = await getAllPasses();
     const user = await UserSchema.find({ _id: id });
 	console.log(user,"user");
@@ -324,6 +325,7 @@ router.get("/userInfo", userAuthorization, async (req, res) => {
 		});
 	  }
   
+    if (user[0].coverPhoto && user[0].profilePicture) {
 	  const coverPhoto = user[0].coverPhoto;
 	  const profilePicture = user[0].profilePicture;
 	  console.log("coverPhoto",coverPhoto);
@@ -338,6 +340,7 @@ router.get("/userInfo", userAuthorization, async (req, res) => {
 	  // Add the URLs to the user object
 	  user[0].coverPhoto = coverPhotoURL.toString();
 	  user[0].profilePicture = profilePictureURL.toString();
+    }
 
 
   
@@ -347,6 +350,34 @@ router.get("/userInfo", userAuthorization, async (req, res) => {
       status: "success",
       userInfo: user,
     });
+  } catch (error) {
+    res.json({ status: "error", message: error.message });
+  }
+});
+
+//check user by wallet address
+router.post("/checkUserByWallet", async (req, res) => {
+  try {
+    const { recipientAddress } = req.body;
+    // const result = await getAllPasses();
+    const user = await UserSchema.find({ walletAddress: recipientAddress });
+    console.log("vfvf", recipientAddress);
+    console.log("vfvfv", user);
+    if (user.length > 0) {
+      return res.json({
+        status: "success",
+        userName: user[0].name,
+        userEmail: user[0].email,
+      });
+    }
+    else{
+      return res.json({
+        status: "error",
+      });
+    }
+
+
+
   } catch (error) {
     res.json({ status: "error", message: error.message });
   }

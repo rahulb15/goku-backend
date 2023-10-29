@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const CollectionSchema = new Schema({
   clientId: {
 		type: Schema.Types.ObjectId,
+        ref: "User",
 	},
   collectionName: {
     type: String,
@@ -23,6 +24,9 @@ category:{
   type:String
 },
 imageUrl:{
+    type:String
+},
+bannerUrl:{
     type:String
 },
 totalSupply:{
