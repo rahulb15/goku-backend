@@ -10,6 +10,7 @@ const {
   getNftPassById,
   getNftPassById2,
   getPassByTab,
+  getUserDbcooperMarketplaceTrueAll,
 } = require("../models/passDetails/passModel");
 const { UserSchema } = require("../models/user/user.schema");
 const mongoose = require("mongoose");
@@ -1241,6 +1242,33 @@ router.get("/user-nft-on-marketplace", userAuthorization, async (req, res) => {
     return res.json({
       status: "success",
       data: userNftOnMarketplace,
+    });
+  } catch (error) {
+    res.json({ status: "error", message: error.message });
+  }
+});
+
+router.post("/user-dbcooper-all", async (req, res) => {
+  try {
+    // const id = req.userId;
+    const { search, minAmount, maxAmount, selected } = req.body;
+    const page = req.query.page;
+    const limit = req.query.limit;
+    // const result = await getAllPasses();
+    const userNftCollection = await getUserDbcooperMarketplaceTrueAll(
+      page,
+      limit,
+      search,
+      minAmount,
+      maxAmount,
+      selected
+    );
+
+    
+
+    return res.json({
+      status: "success",
+      data: userNftCollection,
     });
   } catch (error) {
     res.json({ status: "error", message: error.message });
