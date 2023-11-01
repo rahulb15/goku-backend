@@ -646,6 +646,51 @@ router.post('/user-collection-category-1', async (req, res) => {
 
 
 
+router.put('/update-token-list', async (req, res) => {
+    try {
+        const { tokenList, collectionId, totalSupply } = req.body;
+        const id = collectionId;
+        console.log("csc", id);
+
+        const collection = await CollectionSchema.findOne({ _id: id });
+
+        if (!collection) {
+            return res.json({
+                status: "error",
+                message: "Collection not found",
+            });
+        }
+
+        // Calculate the updated token list
+        const updatedTokenList = collection.tokenList.concat(tokenList);
+
+        // Update the collection document with the new token list
+        const updatedCollection = await CollectionSchema.updateOne(
+            { _id: id },
+            {
+                $set: {
+                    tokenList: updatedTokenList,
+                    totalSupply: totalSupply,
+                    updatedDate: Date.now(),
+                }
+            }
+        );
+
+        console.log("passes67", updatedCollection);
+
+        return res.json({
+            status: "success",
+            data: updatedCollection,
+        });
+
+    } catch (error) {
+        res.json({ status: 'error', message: error.message });
+    }
+});
+
+
+
+
 
 
 
