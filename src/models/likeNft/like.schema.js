@@ -7,6 +7,7 @@ const NftLikeSchema = new Schema({
   },
   nftLiked: {
     type: Schema.Types.ObjectId,
+    ref: "Nft",
   },
   type: {
     type: String,

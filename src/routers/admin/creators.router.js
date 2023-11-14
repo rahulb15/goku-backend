@@ -96,7 +96,6 @@ router.post('/filterCreators',adminUserAuthorization, async (req, res) => {
 
 		const userProf = await getFilteredCreators(pageno,limitno,filterString);
 		const userProf2= await getAllCreators(filterString)
-		console.log("safa",userProf)
 		
 		const totalPages=Math.ceil((userProf2.length)/(limitno))
 		var pageNoArray=[]

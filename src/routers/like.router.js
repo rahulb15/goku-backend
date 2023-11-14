@@ -3,6 +3,7 @@ const router = express.Router();
 const { NftLikeSchema } = require("../models/likeNft/like.schema");
 const { NftSchema } = require("../models/nfts/nft.schema");
 const { getNftById, getNftByIdPass } = require("../models/nfts/nft.model");
+const { ActivitySchema } = require("../models/activityModal/activity.schema");
 const {
   addNftLikes,
   getLikedNftById,
@@ -28,6 +29,23 @@ router.post("/addLikedNft", userAuthorization, async (req, res) => {
     };
 
     const result = await addNftLikes(newNFTObj);
+    console.log("result", result);
+    const nft = await getNftById(nftLiked);
+    console.log("nft", nft);
+    if (result !== null && nft !== null) {
+      const newActivityObj = {
+        clientId,
+        activityType: "like",
+        nftId: nftLiked,
+        activityInfo: "You have liked a NFT",
+        collectionName : nft[0].collectionName,
+        activityStatus : "Like",
+        collectionId : nft[0].collectionId,
+        activityImageUrl : nft[0].tokenImage,
+      };
+      const resultActivity = await ActivitySchema.create(newActivityObj);
+    }
+
 
     res.json({ status: "success", message: "You have liked a NFT" });
   } catch (error) {
@@ -122,7 +140,6 @@ router.get("/get-favorited-nft", userAuthorization, async (req, res) => {
     // 	likedNft ? totalFavoritedNft.push(likedNft[0]) : null
     // });
 
-    console.log("hella", totalFavoritedNft);
 
     res.json({ status: "success", data: totalFavoritedNft });
   } catch (error) {
@@ -131,14 +148,12 @@ router.get("/get-favorited-nft", userAuthorization, async (req, res) => {
 });
 
 router.get("/get-favorited-nft-pass", userAuthorization, async (req, res) => {
-	console.log("ssc123");
   
 	const clientId = req.userId;
 	const type = req.query.type;
   
 	try {
 	  const result = await getAllLikedNftByUsers(clientId, type);
-	  console.log("resulta", result);
 	  const totalFavoritedNft = [];
   
 	  for (i = 0; i < result.length; i++) {
@@ -153,7 +168,6 @@ router.get("/get-favorited-nft-pass", userAuthorization, async (req, res) => {
 	  // 	likedNft ? totalFavoritedNft.push(likedNft[0]) : null
 	  // });
   
-	  console.log("hella", totalFavoritedNft);
   
 	  res.json({ status: "success", data: totalFavoritedNft });
 	} catch (error) {

@@ -35,7 +35,7 @@ const upload = multer({ dest: "uploads/" });
 var multipart = require("connect-multiparty");
 const nftSchema = require("../models/nfts/nft.schema");
 const multipartMiddleware = multipart();
-
+const { ActivitySchema } = require("../models/activityModal/activity.schema");
 router.post("/add-nft", userAuthorization, async (req, res) => {
   
   
@@ -404,17 +404,6 @@ router.get("/all-users-nft-views", async (req, res) => {
 );
 
 
-
-
-
-
-
-
-
-
-
-
-
 router.post(
   "/all-users-nft-hot-collections-by-collectionId",
   async (req, res) => {
@@ -472,8 +461,9 @@ router.patch("/user-nft", userAuthorization, async (req, res) => {
 });
 
 //find and update nft by id
-router.patch("/update-nft", async (req, res) => {
+router.patch("/update-nft", userAuthorization, async (req, res) => {
   try {
+    const clientId = req.userId;
     const {
       _id,
       bidder,
@@ -578,6 +568,31 @@ router.patch("/update-nft", async (req, res) => {
     const updateNft = await NftSchema.findByIdAndUpdate(_id, updateObj, {
       new: true,
     });
+    console.log(updateNft, "updateNftxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", clientId);
+    console.log(history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "");
+
+    if(
+      history?.category == "bid" ||
+      history?.category == "transfer" ||
+      history?.category == "mint" ||
+      history?.category == "sale" ||
+      history?.category == "auction"
+    )
+    {
+      const newActivityObj = {
+        clientId,
+        activityType: history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "",
+        nftId: updateNft._id,
+        activityInfo: "You have "+history?.category+" a NFT",
+        collectionName : updateNft.collectionName,
+        activityStatus : history?.category ? history?.category === "buy" ? "Purchase" : history?.category === "auction" ? "Listing" : history?.category : "",
+        collectionId : updateNft.collectionId,
+        activityImageUrl : updateNft.tokenImage,
+      };
+      console.log(newActivityObj,"newActivityObjnewActivityObjnewActivityObjnewActivityObjnewActivityObj");
+      const resultActivity = await ActivitySchema.create(newActivityObj);
+    }
+    
 
     
 
@@ -591,10 +606,10 @@ router.patch("/update-nft", async (req, res) => {
 });
 
 //find if gift tokenId is already exist or not and update nft by id
-router.patch("/update-nft-gift", async (req, res) => {
+router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
   try {
+    const clientId = req.userId;
     const {
-      clientId,
       tokenId,
       creator,
       sellingType,
@@ -610,7 +625,6 @@ router.patch("/update-nft-gift", async (req, res) => {
 
     //find creator in user table
     const findUSer = await UserSchema.findOne({ walletAddress: creator });
-    console.log("findUSer", findUSer);
 
     //if user not found then delete nft
     if (!findUSer) {
@@ -624,6 +638,9 @@ router.patch("/update-nft-gift", async (req, res) => {
     }
 
     let newHistoryEntry = null;
+    // enum: ["mint", "sale", "bid", "transfer","like","purchase","listing" ],
+   
+
 
     if (
       history?.category == "bid" ||
@@ -705,6 +722,28 @@ router.patch("/update-nft-gift", async (req, res) => {
         new: true,
       }
     );
+
+    console.log(findByTokenIdAndUpdate, "findByTokenIdAndUpdatexxxxxxxxxxxx");
+
+    if(
+      history?.category == "bid" ||
+      history?.category == "transfer" ||
+      history?.category == "mint" ||
+      history?.category == "sale"
+    )
+    {
+      const newActivityObj = {
+        clientId,
+        activityType: history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "",
+        nftId: findByTokenIdAndUpdate._id,
+        activityInfo: "You have "+history?.category+" a NFT",
+        collectionName : findByTokenIdAndUpdate.collectionName,
+        activityStatus : history?.category ? history?.category === "buy" ? "Purchase" : history?.category === "auction" ? "Listing" : history?.category : "",
+        collectionId : findByTokenIdAndUpdate.collectionId,
+        activityImageUrl : findByTokenIdAndUpdate.tokenImage,
+      };
+      const resultActivity = await ActivitySchema.create(newActivityObj);
+    }
     
 
     return res.json({

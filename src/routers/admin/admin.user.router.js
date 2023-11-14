@@ -191,8 +191,6 @@ router.post("/changePassword", async (req, res) => {
   const { oldPassword, newPassword, confirmPassword } = req.body;
   
   
-  console.log("confirmPassword", confirmPassword)
-  console.log("req.userId",req.query.userId)
   try {
     if (confirmPassword !== newPassword) {
       return res.json({ status: "error", message: "Password doesn't Match" });

@@ -40,7 +40,6 @@ if(process.env.HOST == 'localhost'){
    }
    else{
      // const DB_URL = `mongodb+srv://kryptoMerch:${process.env.DB_PWD}@cluster0.oscauqv.mongodb.net/?retryWrites=true&w=majority`
-     console.log("hjbsjac")
      mongoose.connect(`mongodb://kryptomerch_user:09jEchs37s1sh389exdE92yhRF@127.0.0.1:27017/kryptomerch_db`, {
        useNewUrlParser: true,
        useUnifiedTopology: true
@@ -81,6 +80,7 @@ const likeNftRouter=require("./src/routers/like.router")
 const creatorRouter=require("./src/routers/admin/creators.router")
 const adminCollectionRouter=require("./src/routers/admin/adminCollection.router")
 const adminNftRouter=require("./src/routers/admin/adminNft.router")
+const activityRouter=require("./src/routers/activity.router")
 
 
 //Use Routers
@@ -92,6 +92,7 @@ app.use("/hashPass",hashPassRouter)
 app.use("/collection",collectionRouter)
 app.use("/nft",nftRouter)
 app.use("/liked-nft",likeNftRouter)
+app.use("/activity",activityRouter)
 
 
  //Admin routers

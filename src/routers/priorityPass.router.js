@@ -12,9 +12,7 @@ router.post("/addPass",async(req,res)=>{
 try{
 const {passNumber}=req.body
 const result1 =	await PriorityPassSchema.find()
-console.log("resulthai",result1)
 const result=await insertPass({passNumber,totalMintNumber:0,totalPass:passNumber})
-console.log("pass",result)
 res.json({ status: 'success', message: 'user updated', result });
 
 }catch(error){

@@ -124,7 +124,6 @@ const createUri = async () => {
         `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
       );
       const all = res.result.data;
-      console.log("aa",all)
       
 
       // createCollection(all);

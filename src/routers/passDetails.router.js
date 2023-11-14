@@ -14,6 +14,7 @@ const {
 } = require("../models/passDetails/passModel");
 const { UserSchema } = require("../models/user/user.schema");
 const mongoose = require("mongoose");
+const { ActivitySchema } = require("../models/activityModal/activity.schema");
 router.post("/savePass", userAuthorization, async (req, res) => {
   
   const {
@@ -43,6 +44,7 @@ router.post("/savePass", userAuthorization, async (req, res) => {
     };
 
     const result = await insertPassDetails(newPassObj);
+    console.log("result", result);
 
     
 
@@ -209,10 +211,7 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       onMarketplace: onMarketplace ? onMarketplace : false,
       nftPrice,
     };
-    console.log(
-      "OBJjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj",
-      obj
-    );
+ 
 
     
     const id = req.userId;
@@ -252,6 +251,25 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       new: true,
     });
 
+    if(
+      history?.category == "bid" ||
+      history?.category == "transfer" ||
+      history?.category == "mint" ||
+      history?.category == "sale"
+    )
+    {
+      const newActivityObj = {
+        clientId: mongoose.Types.ObjectId(updatePass._id),
+        activityType: history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "",
+        nftId: updatePass._id,
+        activityInfo: "You have "+history?.category+" a NFT",
+        collectionName : updatePass.collectionName,
+        activityStatus : history?.category ? history?.category === "buy" ? "Purchase" : history?.category === "auction" ? "Listing" : history?.category : "",
+        activityImageUrl : updatePass.tokenImage,
+      };
+      const resultActivity = await ActivitySchema.create(newActivityObj);
+    }
+
     
 
     res.json({ status: "success", message: "pass updated", data: updatePass });
@@ -263,8 +281,8 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
 
 router.patch("/update-nft-pass-gift", userAuthorization, async (req, res) => {
   try {
+    // const clientId = req.userId;
     const {
-      clientId,
       passTokenId,
       creator,
       sellingType,
@@ -369,8 +387,6 @@ router.patch("/update-nft-pass-gift", userAuthorization, async (req, res) => {
         },
       };
     }
-    console.log("updateObj", updateObj);
-    console.log("passTokenId", passTokenId);
 
     const findByTokenIdAndUpdate = await PassSchema.findOneAndUpdate(
       { passTokenId: passTokenId }, // Filter object
@@ -379,6 +395,25 @@ router.patch("/update-nft-pass-gift", userAuthorization, async (req, res) => {
         new: true,
       }
     );
+
+    if(
+      history?.category == "bid" ||
+      history?.category == "transfer" ||
+      history?.category == "mint" ||
+      history?.category == "sale"
+    )
+    {
+      const newActivityObj = {
+        clientId: mongoose.Types.ObjectId(findUSer._id),
+        activityType: history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "",
+        nftId: findByTokenIdAndUpdate._id,
+        activityInfo: "You have "+history?.category+" a NFT",
+        collectionName : findByTokenIdAndUpdate.collectionName,
+        activityStatus : history?.category ? history?.category === "buy" ? "Purchase" : history?.category === "auction" ? "Listing" : history?.category : "",
+        activityImageUrl : findByTokenIdAndUpdate.tokenImage,
+      };
+      const resultActivity = await ActivitySchema.create(newActivityObj);
+    }
     
 
     return res.json({
@@ -430,6 +465,7 @@ router.post("/getNftPassbyId2", async (req, res) => {
 //find and update nft by id
 router.patch("/update-nft-pass", userAuthorization, async (req, res) => {
   try {
+    const clientId = req.userId;
     const {
       _id,
       bidder,
@@ -533,6 +569,26 @@ router.patch("/update-nft-pass", userAuthorization, async (req, res) => {
     const updateNft = await PassSchema.findByIdAndUpdate(_id, updateObj, {
       new: true,
     });
+    console.log("updateNftssssssss",updateNft);
+
+    if(
+      history?.category == "bid" ||
+      history?.category == "transfer" ||
+      history?.category == "mint" ||
+      history?.category == "sale"
+    )
+    {
+      const newActivityObj = {
+        clientId,
+        activityType: history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "",
+        nftId: updateNft._id,
+        activityInfo: "You have "+history?.category+" a NFT",
+        collectionName : updateNft.collectionName,
+        activityStatus : history?.category ? history?.category === "buy" ? "Purchase" : history?.category === "auction" ? "Listing" : history?.category : "",
+        activityImageUrl : updateNft.tokenImage,
+      };
+      const resultActivity = await ActivitySchema.create(newActivityObj);
+    }
 
     
 
@@ -587,7 +643,6 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
         date: new Date(), // Use the provided date or the current date
       };
     }
-    console.log("newHistoryEntry", newHistoryEntry);
 
     let newBidObj = null;
     if (onAuction) {
@@ -597,7 +652,6 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
         bidTime: new Date(),
       };
     }
-    console.log("newBidObj", newBidObj);
 
     const obj = {
       collectionName,
@@ -625,7 +679,6 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
     };
 
     // Conditionally add newBidObj to the update
-    console.log(newBidObj,"bidObj");
     if (newBidObj) {
       updateObj.$push = {
         bidInfo: {
@@ -633,13 +686,11 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
-    console.log(updateObj,"updateObj1");
       const updateNft1 = await NftSchema.findByIdAndUpdate(_id, updateObj, {
         new: true,
       });
   
     }
-    console.log("updateObj", updateObj);
    
 
     // Conditionally add newHistoryEntry to the update
@@ -652,7 +703,6 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
       };
     }
 
-    console.log("updateObj", updateObj);
 
     // Update the document
     const updateNft = await NftSchema.findByIdAndUpdate(_id, updateObj, {
@@ -714,7 +764,6 @@ router.patch("/bidding-pass", userAuthorization, async (req, res) => {
         date: new Date(), // Use the provided date or the current date
       };
     }
-    console.log("newHistoryEntry", newHistoryEntry);
 
     let newBidObj = null;
     if (onAuction) {
@@ -724,7 +773,6 @@ router.patch("/bidding-pass", userAuthorization, async (req, res) => {
         bidTime: new Date(),
       };
     }
-    console.log("newBidObj", newBidObj);
 
     const obj = {
       collectionName,
@@ -751,7 +799,6 @@ router.patch("/bidding-pass", userAuthorization, async (req, res) => {
     };
 
     // Conditionally add newBidObj to the update
-    console.log(newBidObj,"bidObj");
     if (newBidObj) {
       updateObj.$push = {
         bidInfo: {
@@ -759,13 +806,11 @@ router.patch("/bidding-pass", userAuthorization, async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
-    console.log(updateObj,"updateObj1");
       const updateNft1 = await PassSchema.findByIdAndUpdate(_id, updateObj, {
         new: true,
       });
   
     }
-    console.log("updateObj", updateObj);
    
 
     // Conditionally add newHistoryEntry to the update
@@ -778,7 +823,6 @@ router.patch("/bidding-pass", userAuthorization, async (req, res) => {
       };
     }
 
-    console.log("updateObj", updateObj);
 
     // Update the document
     const updateNft = await PassSchema.findByIdAndUpdate(_id, updateObj, {
@@ -1090,7 +1134,6 @@ router.get("/all-nft-on-marketplace-dbcooper", async (req, res) => {
     const floorPrice = floorPriceResult.length > 0 ? floorPriceResult[0].floorPrice : 0;
 
 
-    console.log("nftPriceSum", nftPriceSum, "floorPrice", floorPrice);
     
 
     return res.json({

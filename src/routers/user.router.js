@@ -49,7 +49,6 @@ async function putObject(key, body) {
 	},
   });
   const data = await s3.send(command);
-  console.log(data);
 }
 
 function generateUniqueFileName(originalFileName) {
@@ -108,21 +107,16 @@ var corsOptions = {
 // });
 
 router.post("/register", async (req, res) => {
-  console.log("ssc1");
   const { walletAddress } = req.body;
 
   try {
     const newUserObj = {
       walletAddress,
     };
-    console.log("hey1", walletAddress);
     const accessJWT = await crateAccessJWT(walletAddress);
-    console.log("Ss", accessJWT);
     const walletAddressExist = await UserSchema.findOne({
       walletAddress: walletAddress,
     }).lean();
-    console.log("hh");
-    console.log("hh245", walletAddressExist);
     if (walletAddressExist) {
       UserSchema.findOneAndUpdate(
         { _id: walletAddressExist._id },
@@ -148,7 +142,6 @@ router.post("/register", async (req, res) => {
 
     const result = await insertUser(newUserObj);
 
-    console.log(result);
 
     res.json({
       status: "success",
@@ -173,7 +166,6 @@ router.patch(
   userAuthorization,
   async (req, res) => {
     try {
-      console.log("hjh");
       const _id = req.userId;
       var {
         name,
@@ -186,10 +178,8 @@ router.patch(
       } = req.body;
 
  
-	  console.log(" _id", _id);
 
       const userProf = await getUserById(_id);
-	  console.log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",userProf);
       userProf.name = name ? name : userProf.name;
       userProf.email = email ? email : userProf.email;
       userProf.userName = userName ? userName : userProf.userName;
@@ -218,7 +208,6 @@ router.patch(
   upload.fields([{ name: "coverPhoto" }, { name: "profilePicture" }]),
   async (req, res) => {
     try {
-      console.log("hjh");
       const _id = req.userId;
       var {
         name,
@@ -229,8 +218,6 @@ router.patch(
         twitterUrl,
         InstagramUrl,
       } = req.body;
-	  console.log("hjh",req.body);
-	  console.log("websiteUrl",websiteUrl,req.body.websiteUrl);
 
       // Check if cover photo and profile picture files were uploaded
       const coverPhoto = req.files["coverPhoto"];
@@ -239,24 +226,20 @@ router.patch(
       let coverPhotoFileName, profilePictureFileName; // Initialize file name variables
 
       if (coverPhoto) {
-		console.log("coverPhotooooooooooooooooooooooooooo",coverPhoto);
         // Generate a unique file name for the cover photo and upload it to S3
         coverPhotoFileName = generateUniqueFileName(coverPhoto[0].originalname);
         await putObject(coverPhotoFileName, coverPhoto[0].buffer);
       }
 
       if (profilePicture) {
-		console.log("profilePicccccccccccccccccccccccccc",profilePicture);
         // Generate a unique file name for the profile picture and upload it to S3
         profilePictureFileName = generateUniqueFileName(
           profilePicture[0].originalname
         );
         await putObject(profilePictureFileName, profilePicture[0].buffer);
       }
-	  console.log(" _id", _id);
 
       const userProf = await getUserById(_id);
-	  console.log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",userProf);
       userProf.name = name ? name : userProf.name;
       userProf.email = email ? email : userProf.email;
       userProf.userName = userName ? userName : userProf.userName;
@@ -276,13 +259,11 @@ router.patch(
         userProf.profilePicture = profilePictureFileName;
       }
 
-	  console.log("zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz",userProf);
 
       const result = await insertUser(userProf);
 
       res.json({ status: "success", message: "User has been Updated", result });
     } catch (error) {
-      console.log(error);
       res.json({ status: "error", message: error.message });
     }
   }
@@ -293,8 +274,6 @@ router.get("/checkUser", userAuthorization, async (req, res) => {
     const id = req.userId;
     // const result = await getAllPasses();
     const user = await UserSchema.find({ _id: id });
-    console.log("passes69", id);
-    console.log("passes69", user);
     if (user[0].name) {
       return res.json({
         status: "success",
@@ -314,10 +293,8 @@ router.get("/checkUser", userAuthorization, async (req, res) => {
 router.get("/userInfo", userAuthorization, async (req, res) => {
   try {
     const id = req.userId;
-    console.log("idsssssssssssssssssss", id);
     // const result = await getAllPasses();
     const user = await UserSchema.find({ _id: id });
-	console.log(user,"user");
 	if (!user) {
 		return res.status(404).json({
 		  status: "error",
@@ -328,14 +305,10 @@ router.get("/userInfo", userAuthorization, async (req, res) => {
     if (user[0].coverPhoto && user[0].profilePicture) {
 	  const coverPhoto = user[0].coverPhoto;
 	  const profilePicture = user[0].profilePicture;
-	  console.log("coverPhoto",coverPhoto);
-	  console.log("profilePicture",profilePicture);
   
 	  // Call getObjectURL to get S3 URLs for coverPhoto and profilePicture
 	  const coverPhotoURL = await getObjectURL(coverPhoto);
 	  const profilePictureURL = await getObjectURL(profilePicture);
-	  console.log("coverPhotoURL",coverPhotoURL);
-	  console.log("profilePictureURL",profilePictureURL);
 
 	  // Add the URLs to the user object
 	  user[0].coverPhoto = coverPhotoURL.toString();
@@ -344,7 +317,6 @@ router.get("/userInfo", userAuthorization, async (req, res) => {
 
 
   
-	  console.log("new user",user);
 
     return res.json({
       status: "success",
@@ -361,8 +333,6 @@ router.post("/checkUserByWallet", async (req, res) => {
     const { recipientAddress } = req.body;
     // const result = await getAllPasses();
     const user = await UserSchema.find({ walletAddress: recipientAddress });
-    console.log("vfvf", recipientAddress);
-    console.log("vfvfv", user);
     if (user.length > 0) {
       return res.json({
         status: "success",
