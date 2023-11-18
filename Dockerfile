@@ -1,13 +1,23 @@
-FROM node:16.20.0-alpine
+FROM node:18.17.1-alpine3.18
+
 # Create app directory
 WORKDIR /usr/src/marketplace-backend
+
 # Install app dependencies
-# A wildcard is used to ensure both package.json AND package-lock.json are copied
-# where available (npm@5+)
 COPY package*.json ./
-RUN npm install
-#To bundle your app’s source code inside the Docker image, use the COPY instruction:
+
+RUN npm install -g npm@latest
+RUN npm install --production
+
+# Copy your application code
 COPY . .
-#Your app binds to port 3000 so you’ll use the EXPOSE instruction to have it mapped by the docker daemon:
-EXPOSE 5000
-CMD [“npm”, “start”]
+
+# Expose the port
+EXPOSE 3001
+
+# Start your application
+CMD ["npm", "start"]
+# CMD ["node", "index.js"]
+
+
+
