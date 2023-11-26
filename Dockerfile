@@ -6,8 +6,8 @@ WORKDIR /usr/src/marketplace-backend
 # Install app dependencies
 COPY package*.json ./
 
-RUN npm install -g npm@latest
-#RUN npm install --production
+#RUN npm install -g npm@latest
+RUN npm install --production
 
 # Copy your application code
 COPY . .
