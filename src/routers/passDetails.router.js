@@ -134,7 +134,7 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       nftPrice,
     } = req.body;
     const { bidPrice } = req.body;
-
+    const clientId = req.userId;
     let newHistoryEntry = null;
 
     if (
@@ -259,7 +259,7 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
     )
     {
       const newActivityObj = {
-        clientId: mongoose.Types.ObjectId(updatePass._id),
+        clientId: mongoose.Types.ObjectId(clientId),
         activityType: history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "",
         nftId: updatePass._id,
         activityInfo: "You have "+history?.category+" a NFT",

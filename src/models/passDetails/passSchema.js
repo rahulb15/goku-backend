@@ -1,6 +1,29 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
+const CandlestickSchema = new mongoose.Schema({
+  open: {
+    type: Number,
+    required: true,
+  },
+  close: {
+    type: Number,
+    required: true,
+  },
+  low: {
+    type: Number,
+    required: true,
+  },
+  high: {
+    type: Number,
+    required: true,
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+});
+
 const PassSchema = new Schema({
   passName: {
     type: String,
@@ -115,6 +138,10 @@ history: [{
 views: {
   type: Number,
   default: 0
+},
+candlestickData: {
+  type: [CandlestickSchema], // Array of CandlestickSchema
+  default: [],
 },
   
   createdAt: {

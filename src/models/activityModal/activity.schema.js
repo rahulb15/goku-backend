@@ -19,11 +19,9 @@ const ActivitySchema = new Schema({
     },
     collectionId: {
         type: Schema.Types.ObjectId,
-        ref: "Collection",
     },
     nftId: {
         type: Schema.Types.ObjectId,
-        ref: "Nft",
     },
     activityStatus:{
         type:String

@@ -24,7 +24,8 @@ const insertActivityDetails = (userObj) => {
                     reject(error);
                 }
                 resolve(data);
-            }).populate('nftId').populate('collectionId').populate('clientId').sort({ createdAt: -1 });
+                console.log(data,"datasssssssssssssss")
+            }).populate('clientId').sort({ createdAt: -1 });
         } catch (error) {
             reject(error);
         }

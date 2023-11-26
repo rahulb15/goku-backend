@@ -7,7 +7,7 @@ WORKDIR /usr/src/marketplace-backend
 COPY package*.json ./
 
 RUN npm install -g npm@latest
-RUN npm install --production
+#RUN npm install --production
 
 # Copy your application code
 COPY . .
@@ -17,7 +17,7 @@ EXPOSE 3001
 
 # Start your application
 CMD ["npm", "start"]
-# CMD ["node", "index.js"]
+
 
 
 

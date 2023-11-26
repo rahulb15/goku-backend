@@ -81,6 +81,7 @@ const creatorRouter=require("./src/routers/admin/creators.router")
 const adminCollectionRouter=require("./src/routers/admin/adminCollection.router")
 const adminNftRouter=require("./src/routers/admin/adminNft.router")
 const activityRouter=require("./src/routers/activity.router")
+const propertyRouter=require("./src/routers/properties.router")
 
 
 //Use Routers
@@ -93,6 +94,7 @@ app.use("/collection",collectionRouter)
 app.use("/nft",nftRouter)
 app.use("/liked-nft",likeNftRouter)
 app.use("/activity",activityRouter)
+app.use("/properties",propertyRouter)
 
 
  //Admin routers
