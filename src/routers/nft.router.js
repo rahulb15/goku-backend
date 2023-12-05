@@ -481,6 +481,8 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
       onSale,
       onAuction,
       history,
+      fileImageUrl,
+      fileName
     } = req.body;
     const { bidPrice } = req.body;
 
@@ -528,6 +530,8 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
       duration,
       onSale: onSale ? onSale : false,
       onAuction: onAuction ? onAuction : false,
+      fileImageUrl,
+      fileName
     };
     
 

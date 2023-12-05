@@ -102,6 +102,12 @@ const NftSchema = new Schema({
         type: Number,
         default: 0
     },
+    fileImageUrl: {
+        type: String
+    },
+    fileName: {
+        type: String
+    },
         
 
     createdAt: {

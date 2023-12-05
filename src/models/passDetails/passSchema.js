@@ -135,6 +135,12 @@ history: [{
   },
 }
 ],
+fileImageUrl: {
+  type: String,
+},
+fileName: {
+  type: String,
+},
 views: {
   type: Number,
   default: 0

@@ -132,6 +132,8 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       bidder,
       onAuction,
       nftPrice,
+      fileImageUrl,
+      fileName
     } = req.body;
     const { bidPrice } = req.body;
     const clientId = req.userId;
@@ -210,6 +212,8 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       onAuction: onAuction ? onAuction : false,
       onMarketplace: onMarketplace ? onMarketplace : false,
       nftPrice,
+      fileImageUrl,
+      fileName
     };
  
 
