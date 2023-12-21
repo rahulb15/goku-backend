@@ -1,9 +1,9 @@
 const Pact = require('pact-lang-api');
 const fs = require('fs');
 
-const NETWORK_ID = 'testnet04';
-const CHAIN_ID = '1';
-const API_HOST = `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
+const NETWORK_ID = 'mainnet01';
+const CHAIN_ID = '8';
+const API_HOST = `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
 const CONTRACT_PATH = '/Users/shubhamarya/Desktop/Flexsin/marketplace-contract/poly-fungible-v2.pact';
 // const KEY_PAIR = {
 //   'publicKey': 'ca5ca1076e30bb9244453799f8c088af97a66973eb8e3dd3cff88b82b95cc4bd',

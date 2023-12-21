@@ -16,16 +16,13 @@ const yourObject = require('./mynewfile4.json');
 
 const Index = () => {
 
-  // const NETWORK_ID = "mainnet01";
-  const NETWORK_ID = "testnet04";
+  const NETWORK_ID = "mainnet01";
   const GAS_PRICE = 0.0000001;
   const GAS_LIMIT = 150000;
   const TTL = 28000;
-  const CHAIN_ID = "1";
-  // const CHAIN_ID = "8";
+  const CHAIN_ID = "8";
   const creationTime = () => Math.round((new Date()).getTime() / 1000) - 15;
-  // const API_HOST = `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
-  const API_HOST = `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
+  const API_HOST = `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
   const { kadena } = window;
   const GAS_STATION = 'election-gas-station';
  

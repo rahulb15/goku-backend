@@ -326,15 +326,16 @@ router.patch("/update-nft-pass-gift", userAuthorization, async (req, res) => {
       history?.category == "cancelAuction" ||
       history?.category == "closeSale" ||
       history?.category == "cancelBid"
-    ) {
-      newHistoryEntry = {
+      ) {
+      newHistoryEntry = 
+      {
         owner: history.owner,
         price: history.price,
         category: history.category,
         date: new Date(), // Use the provided date or the current date
       };
     }
-
+ 
     let newBidObj = null;
     if (onAuction) {
       newBidObj = {

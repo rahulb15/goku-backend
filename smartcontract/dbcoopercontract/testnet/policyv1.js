@@ -1,9 +1,9 @@
 const Pact = require('pact-lang-api');
 const fs = require('fs');
 
-const NETWORK_ID = 'testnet04';
-const CHAIN_ID = '1';
-const API_HOST = `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
+const NETWORK_ID = 'mainnet01';
+const CHAIN_ID = '8';
+const API_HOST = `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
 const CONTRACT_PATH = '/Users/shubhamarya/Desktop/Flexsin/duplicat-dbcoppercontract /dbc-token-policy-v1.pact';
 
 

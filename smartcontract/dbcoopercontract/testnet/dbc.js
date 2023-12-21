@@ -1,9 +1,9 @@
 const Pact = require('pact-lang-api');
 const fs = require('fs');
 
-const NETWORK_ID = 'testnet04';
-const CHAIN_ID = '1';
-const API_HOST = `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
+const NETWORK_ID = 'mainnet01';
+const CHAIN_ID = '8';
+const API_HOST = `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
 const CONTRACT_PATH = '/Users/shubhamarya/Desktop/Flexsin/main_files/dbcoopercontract /dbcoppercontract4.pact';
 //   'publicKey': 'ca5ca1076e30bb9244453799f8c088af97a66973eb8e3dd3cff88b82b95cc4bd',
 //   'secretKey': '4b4b0077b33b61ec69f26787cc60383af7bc80e6aa8adcd465cc003221685ee9'

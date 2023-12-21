@@ -89,13 +89,13 @@ import React, { Component } from 'react'
 
 const Index = () => {
 
-  const NETWORK_ID = "testnet04";
+  const NETWORK_ID = "";
   const GAS_PRICE = 0.0000001;
   const GAS_LIMIT = 15000;
   const TTL = 28000;
   const CHAIN_ID = "1";
   const creationTime = () => Math.round((new Date()).getTime() / 1000) - 15;
-  const API_HOST = `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
+  const API_HOST = `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
   const { kadena } = window;
   const a = "k:057644c6dc3da0b6e5c695508afd24198171577802fcaaa351ae77bc0f2244c1"
   const b = "demobankacc6"

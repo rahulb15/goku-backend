@@ -1,11 +1,11 @@
 const Pact = require("pact-lang-api");
-const NETWORK_ID = "testnet04";
+const NETWORK_ID = "mainnet01";
 const GAS_PRICE = 0.01111;
 const GAS_LIMIT = 150000;
 const TTL = 28000;
-const CHAIN_ID = "1";
+const CHAIN_ID = "8";
 const creationTime = () => Math.round((new Date).getTime() / 1000) - 15;
-const API_HOST = `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
+const API_HOST = `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`;
 const KEY_PAIR = {
   publicKey: "260fe7bca08c45c03d4fc5f3d0a7fafaa8d28d4a3c3db0b2158dd18725ab0586",
   secretKey: "01faa327e37b1ec26b7adca1469e25ccd776e33776496edc860d3834aaeb0906"
@@ -37,7 +37,7 @@ const KP = {
 //           envData: {scheme,data},
 //           meta: Pact.lang.mkMeta("k:260fe7bca08c45c03d4fc5f3d0a7fafaa8d28d4a3c3db0b2158dd18725ab0586", "1", GAS_PRICE, GAS_LIMIT, creationTime(), 600),
 //         },
-//         `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
+//         `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
 //       );
 //       const all = res.result.data;
 //       createDatum(all);
@@ -51,7 +51,7 @@ const KP = {
 //          envData: {uri,datum},
 //          meta: Pact.lang.mkMeta("k:260fe7bca08c45c03d4fc5f3d0a7fafaa8d28d4a3c3db0b2158dd18725ab0586", "1", GAS_PRICE, GAS_LIMIT, creationTime(), 600),
 //        },
-//        `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
+//        `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
 //        );
 //      const all = res.result.data;
 //      const ary = [all];
@@ -68,7 +68,7 @@ const KP = {
 //         envData: {uri,data},
 //         meta: Pact.lang.mkMeta("k:260fe7bca08c45c03d4fc5f3d0a7fafaa8d28d4a3c3db0b2158dd18725ab0586", "1", GAS_PRICE, GAS_LIMIT, creationTime(), 600),
 //       },
-//       `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
+//       `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
 //     );
 //     const all = res.result.data;    
 //     createCollection(all)
@@ -83,7 +83,7 @@ const createUri = async () => {
       },
       meta: Pact.lang.mkMeta("k:260fe7bca08c45c03d4fc5f3d0a7fafaa8d28d4a3c3db0b2158dd18725ab0586", "1", GAS_PRICE, GAS_LIMIT, creationTime(), 600),
     },
-    `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
+    `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
   );
   const all = res.result.data;
   createDatum(all);
@@ -104,7 +104,7 @@ const createUri = async () => {
               }},
            meta: Pact.lang.mkMeta("k:260fe7bca08c45c03d4fc5f3d0a7fafaa8d28d4a3c3db0b2158dd18725ab0586", "1", GAS_PRICE, GAS_LIMIT, creationTime(), 600),
          },
-         `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
+         `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
          );
        const all = res.result.data;
        const ary = [all];
@@ -121,7 +121,7 @@ const createUri = async () => {
           envData: {uri,data},
           meta: Pact.lang.mkMeta("k:260fe7bca08c45c03d4fc5f3d0a7fafaa8d28d4a3c3db0b2158dd18725ab0586", "1", GAS_PRICE, GAS_LIMIT, creationTime(), 600),
         },
-        `https://api.testnet.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
+        `https://api.chainweb.com/chainweb/0.0/${NETWORK_ID}/chain/${CHAIN_ID}/pact`
       );
       const all = res.result.data;
       
