@@ -667,7 +667,7 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
       imageIndex,
       onMarketplace: onMarketplace ? onMarketplace : false,
       sellingType,
-      nftPrice: nftPrice ? nftPrice : 0,
+      nftPrice,
       duration,
       onSale: onSale ? onSale : false,
       onAuction: onAuction ? onAuction : false,
