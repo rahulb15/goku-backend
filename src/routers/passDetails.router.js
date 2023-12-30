@@ -250,6 +250,25 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       };
     }
 
+    if (
+      (history &&
+        typeof history === "object" &&
+        history.category == "cancelAuction") ||
+      history.category == "closeSale" ||
+      history.category == "cancelBid"
+    ) {
+
+      // add query to get last mint entry from history array and update nft price with last mint price
+      const lastSaleEntry = await PassSchema.findOne(
+        { _id: _id },
+        { history: { $slice: -1 } }
+      );
+      console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
+      if (lastSaleEntry) {
+        updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+      }
+    }
+
     // Update the document
     const updatePass = await PassSchema.findByIdAndUpdate(_id, updateObj, {
       new: true,
@@ -390,6 +409,25 @@ router.patch("/update-nft-pass-gift", userAuthorization, async (req, res) => {
           $sort: { date: -1 }, // Sort in descending order based on bidTime
         },
       };
+    }
+
+    if (
+      (history &&
+        typeof history === "object" &&
+        history.category == "cancelAuction") ||
+      history.category == "closeSale" ||
+      history.category == "cancelBid"
+    ) {
+
+      // add query to get last mint entry from history array and update nft price with last mint price
+      const lastSaleEntry = await PassSchema.findOne(
+        { _id: _id },
+        { history: { $slice: -1 } }
+      );
+      console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
+      if (lastSaleEntry) {
+        updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+      }
     }
 
     const findByTokenIdAndUpdate = await PassSchema.findOneAndUpdate(
@@ -568,6 +606,24 @@ router.patch("/update-nft-pass", userAuthorization, async (req, res) => {
         },
       };
     }
+    if (
+      (history &&
+        typeof history === "object" &&
+        history.category == "cancelAuction") ||
+      history.category == "closeSale" ||
+      history.category == "cancelBid"
+    ) {
+
+      // add query to get last mint entry from history array and update nft price with last mint price
+      const lastSaleEntry = await PassSchema.findOne(
+        { _id: _id },
+        { history: { $slice: -1 } }
+      );
+      console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
+      if (lastSaleEntry) {
+        updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+      }
+    }
 
     // Update the document
     const updateNft = await PassSchema.findByIdAndUpdate(_id, updateObj, {
@@ -707,6 +763,25 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
       };
     }
 
+    if (
+      (history &&
+        typeof history === "object" &&
+        history.category == "cancelAuction") ||
+      history.category == "closeSale" ||
+      history.category == "cancelBid"
+    ) {
+
+      // add query to get last mint entry from history array and update nft price with last mint price
+      const lastSaleEntry = await NftSchema.findOne(
+        { _id: _id },
+        { history: { $slice: -1 } }
+      );
+      console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
+      if (lastSaleEntry) {
+        updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+      }
+    }
+
 
     // Update the document
     const updateNft = await NftSchema.findByIdAndUpdate(_id, updateObj, {
@@ -825,6 +900,25 @@ router.patch("/bidding-pass", userAuthorization, async (req, res) => {
           $sort: { date: -1 }, // Sort in descending order based on bidTime
         },
       };
+    }
+
+    if (
+      (history &&
+        typeof history === "object" &&
+        history.category == "cancelAuction") ||
+      history.category == "closeSale" ||
+      history.category == "cancelBid"
+    ) {
+
+      // add query to get last mint entry from history array and update nft price with last mint price
+      const lastSaleEntry = await PassSchema.findOne(
+        { _id: _id },
+        { history: { $slice: -1 } }
+      );
+      console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
+      if (lastSaleEntry) {
+        updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+      }
     }
 
 

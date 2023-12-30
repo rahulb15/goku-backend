@@ -37,11 +37,9 @@ const nftSchema = require("../models/nfts/nft.schema");
 const multipartMiddleware = multipart();
 const { ActivitySchema } = require("../models/activityModal/activity.schema");
 router.post("/add-nft", userAuthorization, async (req, res) => {
-  
-  
   const clientId = req.body.clientId;
   const users = await getUserById(clientId);
-  
+
   const creatorName = users.name;
 
   const {
@@ -83,8 +81,6 @@ router.post("/add-nft", userAuthorization, async (req, res) => {
 
     const result = await insertNftDetails(newCollectionObj);
 
-    
-
     res.json({ status: "success", message: "New NFT created" });
   } catch (error) {
     res.json({ status: "error", message: error });
@@ -94,7 +90,7 @@ router.post("/add-nft", userAuthorization, async (req, res) => {
 router.get("/user-nft", userAuthorization, async (req, res) => {
   try {
     const id = req.userId;
-    
+
     // const result = await getAllPasses();
     // const userNft = await NftSchema.find({ clientId: id });
 
@@ -104,11 +100,9 @@ router.get("/user-nft", userAuthorization, async (req, res) => {
       { $inc: { views: 1 } }
     );
 
-    
     // const uniqueOwner = await getCountNftUniqueOwner(id);
     // const addTotalNftPrice1 = await addTotalNftPrice(id);
     // const base = await getBaseNftPrice(id);
-    
 
     return res.json({
       status: "success",
@@ -128,7 +122,7 @@ router.post("/collection-nft", async (req, res) => {
     const { collectionId, search } = req.body;
     const page = req.query.page;
     const limit = req.query.limit;
-    
+
     // const result = await getAllPasses();
     const userNftCollection = await getNftCollectionById(
       collectionId,
@@ -136,8 +130,6 @@ router.post("/collection-nft", async (req, res) => {
       limit,
       search
     );
-
-    
 
     return res.json({
       status: "success",
@@ -154,7 +146,7 @@ router.post("/collection-nft-marketplace", async (req, res) => {
     const { collectionId, search, minAmount, maxAmount, selected } = req.body;
     const page = req.query.page;
     const limit = req.query.limit;
-    
+
     // const result = await getAllPasses();
     const userNftCollection = await getNftCollectionByIdMarketPlace(
       collectionId,
@@ -165,8 +157,6 @@ router.post("/collection-nft-marketplace", async (req, res) => {
       maxAmount,
       selected
     );
-
-    
 
     return res.json({
       status: "success",
@@ -181,15 +171,13 @@ router.post("/user-own-nft", userAuthorization, async (req, res) => {
   try {
     const id = req.userId;
     const { collectionId } = req.body;
-    
+
     const frmData = {
       collectionId,
       clientId: id,
     };
     // const result = await getAllPasses();
     const userNftCollection = await getNftCollectionOfUser(frmData);
-
-    
 
     return res.json({
       status: "success",
@@ -207,8 +195,6 @@ router.post("/getNftbyId", async (req, res) => {
     // const result = await getAllPasses();
     const userNft = await getNftById(_id);
 
-    
-
     return res.json({
       status: "success",
       data: userNft,
@@ -225,7 +211,6 @@ router.post("/getNftByIdForCandleStickChart", async (req, res) => {
     // const result = await getAllPasses();
     const userNft = await getNftByIdForCandleStickChart(_id);
 
-
     return res.json({
       status: "success",
       data: userNft,
@@ -235,17 +220,12 @@ router.post("/getNftByIdForCandleStickChart", async (req, res) => {
   }
 });
 
-
-
-
 router.post("/getNftbyId2", async (req, res) => {
   try {
     const { _id } = req.body;
 
     // const result = await getAllPasses();
     const userNft = await getNftById2(_id);
-
-    
 
     return res.json({
       status: "success",
@@ -258,8 +238,7 @@ router.post("/getNftbyId2", async (req, res) => {
 
 router.get("/all-users-nft", async (req, res) => {
   const { page, limit } = req.query;
-  
-  
+
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   const results = {};
@@ -292,8 +271,7 @@ router.get("/all-users-nft", async (req, res) => {
 
 router.get("/all-users-nft-hot-collections", async (req, res) => {
   const { page, limit } = req.query;
-  
-  
+
   const startIndex = (page - 1) * limit;
   const endIndex = page * limit;
   const results = {};
@@ -325,7 +303,6 @@ router.get("/all-users-nft-hot-collections", async (req, res) => {
     res.json({ status: "error", message: error.message });
   }
 });
-
 
 router.get("/all-users-nft-hot-collections-1", async (req, res) => {
   //using aggregate get collection with nfts but collection is unique
@@ -365,15 +342,12 @@ router.get("/all-users-nft-hot-collections-1", async (req, res) => {
       },
     },
   ]);
-  
 
   return res.json({
     status: "success",
     data: getCollectionWithNfts,
   });
-}
-);
-
+});
 
 router.get("/all-users-nft-views", async (req, res) => {
   //using aggregate get all nfts sorted by views and limit to 10
@@ -393,24 +367,17 @@ router.get("/all-users-nft-views", async (req, res) => {
     },
   ]);
 
-  
-   
-
   return res.json({
     status: "success",
     data: getCollectionWithNfts,
   });
-}
-);
-
+});
 
 router.post(
   "/all-users-nft-hot-collections-by-collectionId",
   async (req, res) => {
     const { page, limit, collectionId } = req.body;
-    
-    
-    
+
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
     const results = {};
@@ -445,11 +412,9 @@ router.post(
 router.patch("/user-nft", userAuthorization, async (req, res) => {
   try {
     const id = req.userId;
-    
+
     // const result = await getAllPasses();
     const userNft = await NftSchema.find({ clientId: id });
-
-    
 
     return res.json({
       status: "success",
@@ -482,7 +447,7 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
       onAuction,
       history,
       fileImageUrl,
-      fileName
+      fileName,
     } = req.body;
     const { bidPrice } = req.body;
 
@@ -531,13 +496,10 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
       onSale: onSale ? onSale : false,
       onAuction: onAuction ? onAuction : false,
       fileImageUrl,
-      fileName
+      fileName,
     };
-    
 
-    
     const id = req.userId;
-    
 
     //Create an update object based on the presence of newBidObj
     const updateObj = {
@@ -556,7 +518,6 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
         new: true,
       });
     }
-    
 
     // Conditionally add newHistoryEntry to the update
     if (newHistoryEntry) {
@@ -568,35 +529,81 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
       };
     }
 
+    if (
+      (history &&
+        typeof history === "object" &&
+        history.category == "cancelAuction") ||
+      history.category == "closeSale" ||
+      history.category == "cancelBid"
+    ) {
+
+      // add query to get last mint entry from history array and update nft price with last mint price
+      const lastSaleEntry = await NftSchema.findOne(
+        { _id: _id },
+        { history: { $slice: -1 } }
+      );
+      console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
+      if (lastSaleEntry) {
+        updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+      }
+    }
+
+   
+
     // Update the document
     const updateNft = await NftSchema.findByIdAndUpdate(_id, updateObj, {
       new: true,
     });
-    console.log(updateNft, "updateNftxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx", clientId);
-    console.log(history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "");
+    console.log(
+      updateNft,
+      "updateNftxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+      clientId
+    );
+    console.log(
+      history?.category
+        ? history?.category === "buy"
+          ? "purchase"
+          : history?.category === "auction"
+          ? "listing"
+          : history?.category
+        : ""
+    );
 
-    if(
+    if (
       history?.category == "bid" ||
       history?.category == "transfer" ||
       history?.category == "mint" ||
       history?.category == "sale" ||
       history?.category == "auction"
-    )
-    {
+    ) {
       const newActivityObj = {
         clientId,
-        activityType: history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "",
+        activityType: history?.category
+          ? history?.category === "buy"
+            ? "purchase"
+            : history?.category === "auction"
+            ? "listing"
+            : history?.category
+          : "",
         nftId: updateNft._id,
-        activityInfo: "You have "+history?.category+" a NFT",
-        collectionName : updateNft.collectionName,
-        activityStatus : history?.category ? history?.category === "buy" ? "Purchase" : history?.category === "auction" ? "Listing" : history?.category : "",
-        collectionId : updateNft.collectionId,
-        activityImageUrl : updateNft.tokenImage,
+        activityInfo: "You have " + history?.category + " a NFT",
+        collectionName: updateNft.collectionName,
+        activityStatus: history?.category
+          ? history?.category === "buy"
+            ? "Purchase"
+            : history?.category === "auction"
+            ? "Listing"
+            : history?.category
+          : "",
+        collectionId: updateNft.collectionId,
+        activityImageUrl: updateNft.tokenImage,
       };
-      console.log(newActivityObj,"newActivityObjnewActivityObjnewActivityObjnewActivityObjnewActivityObj");
+      console.log(
+        newActivityObj,
+        "newActivityObjnewActivityObjnewActivityObjnewActivityObjnewActivityObj"
+      );
       const resultActivity = await ActivitySchema.create(newActivityObj);
     }
-    
 
     
 
@@ -634,7 +641,7 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
     if (!findUSer) {
       //delete nft from nft table in db
       const deleteNft = NftSchema.remove({ tokenId: tokenId });
-      
+
       return res.json({
         status: "success",
         data: deleteNft,
@@ -643,8 +650,6 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
 
     let newHistoryEntry = null;
     // enum: ["mint", "sale", "bid", "transfer","like","purchase","listing" ],
-   
-
 
     if (
       history?.category == "bid" ||
@@ -700,6 +705,8 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
           $sort: { bidTime: -1 }, // Sort in descending order based on bidTime
         },
       };
+
+      
       const findByTokenIdAndUpdate = await NftSchema.findOneAndUpdate(
         { tokenId: tokenId },
         updateObj,
@@ -719,6 +726,25 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
       };
     }
 
+    if (
+      (history &&
+        typeof history === "object" &&
+        history.category == "cancelAuction") ||
+      history.category == "closeSale" ||
+      history.category == "cancelBid"
+    ) {
+
+      // add query to get last mint entry from history array and update nft price with last mint price
+      const lastSaleEntry = await NftSchema.findOne(
+        { _id: _id },
+        { history: { $slice: -1 } }
+      );
+      console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
+      if (lastSaleEntry) {
+        updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+      }
+    }
+
     const findByTokenIdAndUpdate = await NftSchema.findOneAndUpdate(
       { tokenId: tokenId },
       updateObj,
@@ -729,26 +755,36 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
 
     console.log(findByTokenIdAndUpdate, "findByTokenIdAndUpdatexxxxxxxxxxxx");
 
-    if(
+    if (
       history?.category == "bid" ||
       history?.category == "transfer" ||
       history?.category == "mint" ||
       history?.category == "sale"
-    )
-    {
+    ) {
       const newActivityObj = {
         clientId,
-        activityType: history?.category ? history?.category === "buy" ? "purchase" : history?.category === "auction" ? "listing" : history?.category : "",
+        activityType: history?.category
+          ? history?.category === "buy"
+            ? "purchase"
+            : history?.category === "auction"
+            ? "listing"
+            : history?.category
+          : "",
         nftId: findByTokenIdAndUpdate._id,
-        activityInfo: "You have "+history?.category+" a NFT",
-        collectionName : findByTokenIdAndUpdate.collectionName,
-        activityStatus : history?.category ? history?.category === "buy" ? "Purchase" : history?.category === "auction" ? "Listing" : history?.category : "",
-        collectionId : findByTokenIdAndUpdate.collectionId,
-        activityImageUrl : findByTokenIdAndUpdate.tokenImage,
+        activityInfo: "You have " + history?.category + " a NFT",
+        collectionName: findByTokenIdAndUpdate.collectionName,
+        activityStatus: history?.category
+          ? history?.category === "buy"
+            ? "Purchase"
+            : history?.category === "auction"
+            ? "Listing"
+            : history?.category
+          : "",
+        collectionId: findByTokenIdAndUpdate.collectionId,
+        activityImageUrl: findByTokenIdAndUpdate.tokenImage,
       };
       const resultActivity = await ActivitySchema.create(newActivityObj);
     }
-    
 
     return res.json({
       status: "success",
@@ -763,7 +799,6 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
 router.get("/all-nft-on-auction", async (req, res) => {
   try {
     const allNftOnAuction = await NftSchema.find({ onAuction: true });
-    
 
     return res.json({
       status: "success",
@@ -778,7 +813,6 @@ router.get("/all-nft-on-auction", async (req, res) => {
 router.get("/all-nft-on-sale", async (req, res) => {
   try {
     const allNftOnSale = await NftSchema.find({ onSale: true });
-    
 
     return res.json({
       status: "success",
@@ -790,11 +824,9 @@ router.get("/all-nft-on-sale", async (req, res) => {
 });
 
 router.post("/add-nft-marketplace", userAuthorization, async (req, res) => {
-  
-  
   const walletAddress = req.body.walletAddress;
   const users = await getUserByWallet(walletAddress);
-  
+
   const creatorName = users.name;
 
   const {
@@ -838,8 +870,6 @@ router.post("/add-nft-marketplace", userAuthorization, async (req, res) => {
 
     const result = await insertNftDetails(newCollectionObj);
 
-    
-
     res.json({ status: "success", message: "New NFT created" });
   } catch (error) {
     res.json({ status: "error", message: error });
@@ -848,37 +878,39 @@ router.post("/add-nft-marketplace", userAuthorization, async (req, res) => {
 
 //get user nft all marketplace false
 
-router.post("/user-nft-marketplace-false-1",userAuthorization, async (req, res) => {
-  try {
-    // const id = req.userId;
-    const { search, minAmount, maxAmount, selected } = req.body;
-    const clientId = req.userId;
-    const collectionId = req.body.collectionId;
-    const page = req.query.page;
-    const limit = req.query.limit;
-    
-    // const result = await getAllPasses();
-    const userNftCollection = await getUserNftMarketplaceFalse(
-      collectionId,
-      clientId,
-      page,
-      limit,
-      search,
-      minAmount,
-      maxAmount,
-      selected
-    );
+router.post(
+  "/user-nft-marketplace-false-1",
+  userAuthorization,
+  async (req, res) => {
+    try {
+      // const id = req.userId;
+      const { search, minAmount, maxAmount, selected } = req.body;
+      const clientId = req.userId;
+      const collectionId = req.body.collectionId;
+      const page = req.query.page;
+      const limit = req.query.limit;
 
-    
+      // const result = await getAllPasses();
+      const userNftCollection = await getUserNftMarketplaceFalse(
+        collectionId,
+        clientId,
+        page,
+        limit,
+        search,
+        minAmount,
+        maxAmount,
+        selected
+      );
 
-    return res.json({
-      status: "success",
-      data: userNftCollection,
-    });
-  } catch (error) {
-    res.json({ status: "error", message: error.message });
+      return res.json({
+        status: "success",
+        data: userNftCollection,
+      });
+    } catch (error) {
+      res.json({ status: "error", message: error.message });
+    }
   }
-});
+);
 router.get(
   "/user-nft-marketplace-false",
   userAuthorization,
@@ -889,10 +921,6 @@ router.get(
       const search = req.query.search ? req.query.search : "";
       const page = parseInt(req.query.page);
       const limit = parseInt(req.query.limit);
-      
-      
-      
-      
 
       // s
 
@@ -934,7 +962,6 @@ router.get(
         .limit(limit * 1)
         .skip(startIndex)
         .exec();
-      
 
       return res.json({
         status: "success",
@@ -947,36 +974,37 @@ router.get(
   }
 );
 
+router.post(
+  "/user-nft-marketplace-false-all-collection-1",
+  userAuthorization,
+  async (req, res) => {
+    try {
+      // const id = req.userId;
+      const { search, minAmount, maxAmount, selected } = req.body;
+      const clientId = req.userId;
+      const page = req.query.page;
+      const limit = req.query.limit;
 
-router.post("/user-nft-marketplace-false-all-collection-1",userAuthorization, async (req, res) => {
-  try {
-    // const id = req.userId;
-    const { search, minAmount, maxAmount, selected } = req.body;
-    const clientId = req.userId;
-    const page = req.query.page;
-    const limit = req.query.limit;
-    
-    // const result = await getAllPasses();
-    const userNftCollection = await getNftCollectionByIdMarketPlaceOff(
-      clientId,
-      page,
-      limit,
-      search,
-      minAmount,
-      maxAmount,
-      selected
-    );
+      // const result = await getAllPasses();
+      const userNftCollection = await getNftCollectionByIdMarketPlaceOff(
+        clientId,
+        page,
+        limit,
+        search,
+        minAmount,
+        maxAmount,
+        selected
+      );
 
-    
-
-    return res.json({
-      status: "success",
-      data: userNftCollection,
-    });
-  } catch (error) {
-    res.json({ status: "error", message: error.message });
+      return res.json({
+        status: "success",
+        data: userNftCollection,
+      });
+    } catch (error) {
+      res.json({ status: "error", message: error.message });
+    }
   }
-});
+);
 
 //user nft all marketplace false for all collection
 router.get(
@@ -988,10 +1016,6 @@ router.get(
       const search = req.query.search ? req.query.search : "";
       const page = parseInt(req.query.page);
       const limit = parseInt(req.query.limit);
-      
-      
-      
-      
 
       // s
 
@@ -1045,36 +1069,38 @@ router.get(
 );
 
 //get user nft all marketplace true for all collection and onsale true
-router.post("/user-nft-marketplace-true-all-collection-on-sale-1",userAuthorization, async (req, res) => {
-  try {
-    // const id = req.userId;
-    const { search, minAmount, maxAmount, selected } = req.body;
-    const clientId = req.userId;
-    const page = req.query.page;
-    const limit = req.query.limit;
-    
-    // const result = await getAllPasses();
-    const userNftCollection = await getUserNftMarketplaceTrueAllCollectionOnSale(
-      clientId,
-      page,
-      limit,
-      search,
-      minAmount,
-      maxAmount,
-      selected
-    );
+router.post(
+  "/user-nft-marketplace-true-all-collection-on-sale-1",
+  userAuthorization,
+  async (req, res) => {
+    try {
+      // const id = req.userId;
+      const { search, minAmount, maxAmount, selected } = req.body;
+      const clientId = req.userId;
+      const page = req.query.page;
+      const limit = req.query.limit;
 
-    
+      // const result = await getAllPasses();
+      const userNftCollection =
+        await getUserNftMarketplaceTrueAllCollectionOnSale(
+          clientId,
+          page,
+          limit,
+          search,
+          minAmount,
+          maxAmount,
+          selected
+        );
 
-    return res.json({
-      status: "success",
-      data: userNftCollection,
-    });
-  } catch (error) {
-    res.json({ status: "error", message: error.message });
+      return res.json({
+        status: "success",
+        data: userNftCollection,
+      });
+    } catch (error) {
+      res.json({ status: "error", message: error.message });
+    }
   }
-});
-
+);
 
 router.get(
   "/user-nft-marketplace-true-all-collection-on-sale",
@@ -1085,10 +1111,6 @@ router.get(
       const search = req.query.search ? req.query.search : "";
       const page = parseInt(req.query.page);
       const limit = parseInt(req.query.limit);
-      
-      
-      
-      
 
       // s
 
@@ -1153,10 +1175,6 @@ router.get(
       const search = req.query.search ? req.query.search : "";
       const page = parseInt(req.query.page);
       const limit = parseInt(req.query.limit);
-      
-      
-      
-      
 
       // s
 
@@ -1211,37 +1229,38 @@ router.get(
   }
 );
 
-router.post("/user-nft-marketplace-true-all-collection-on-auction-1",userAuthorization, async (req, res) => {
-  try {
-    // const id = req.userId;
-    const { search, minAmount, maxAmount, selected } = req.body;
-    const clientId = req.userId;
-    const page = req.query.page;
-    const limit = req.query.limit;
-    
-    // const result = await getAllPasses();
-    const userNftCollection = await getUserNftMarketplaceTrueAllCollectionOnAuction(
-      clientId,
-      page,
-      limit,
-      search,
-      minAmount,
-      maxAmount,
-      selected
-    );
+router.post(
+  "/user-nft-marketplace-true-all-collection-on-auction-1",
+  userAuthorization,
+  async (req, res) => {
+    try {
+      // const id = req.userId;
+      const { search, minAmount, maxAmount, selected } = req.body;
+      const clientId = req.userId;
+      const page = req.query.page;
+      const limit = req.query.limit;
 
-    
+      // const result = await getAllPasses();
+      const userNftCollection =
+        await getUserNftMarketplaceTrueAllCollectionOnAuction(
+          clientId,
+          page,
+          limit,
+          search,
+          minAmount,
+          maxAmount,
+          selected
+        );
 
-    return res.json({
-      status: "success",
-      data: userNftCollection,
-    });
-  } catch (error) {
-    res.json({ status: "error", message: error.message });
+      return res.json({
+        status: "success",
+        data: userNftCollection,
+      });
+    } catch (error) {
+      res.json({ status: "error", message: error.message });
+    }
   }
-});
-
-
+);
 
 router.post("/user-nft-all", async (req, res) => {
   try {
@@ -1258,8 +1277,6 @@ router.post("/user-nft-all", async (req, res) => {
       maxAmount,
       selected
     );
-
-    
 
     return res.json({
       status: "success",
