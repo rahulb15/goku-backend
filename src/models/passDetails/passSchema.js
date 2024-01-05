@@ -130,11 +130,20 @@ history: [{
   },
   category: {
       type: String,
-      enum: ["mint", "bid", "buy", "transfer","auction","sale","cancelAuction","closeSale","cancelBid"],
+      enum: ["mint", "bid", "buy", "transfer","auction","sale","cancelAuction","closeSale","cancelBid","gift"],
       default: "mint"
   },
 }
 ],
+chartPrice: [{
+  price: {
+      type: String
+  },
+  date: {
+      type: Date,
+      default: Date.now,
+  }
+}],
 fileImageUrl: {
   type: String,
 },

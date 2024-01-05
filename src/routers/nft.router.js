@@ -462,7 +462,8 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
       history?.category == "mint" ||
       history?.category == "cancelAuction" ||
       history?.category == "closeSale" ||
-      history?.category == "cancelBid"
+      history?.category == "cancelBid" ||
+      history?.category == "gift"
     ) {
       newHistoryEntry = {
         owner: history.owner,
@@ -471,6 +472,20 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
         date: new Date(), // Use the provided date or the current date
       };
     }
+
+    // if (
+    //   history?.category == "bid" ||
+    //   history?.category == "buy" ||
+    //   history?.category == "sale" ||
+    //   history?.category == "transfer" ||
+    //   history?.category == "auction" ||
+    //   history?.category == "mint"
+    // ) {
+    //   chartPrice = {
+    //     price: history.price,
+    //     date: new Date(), // Use the provided date or the current date
+    //   };
+    // }
 
     let newBidObj = null;
     if (onAuction) {
@@ -526,6 +541,10 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
           $each: [newHistoryEntry],
           $sort: { date: -1 }, // Sort in descending order based on bidTime
         },
+        // chartPrice: {
+        //   $each: [chartPrice],
+        //   $sort: { date: -1 }, // Sort in descending order based on bidTime
+        // },
       };
     }
 
@@ -545,6 +564,17 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
       console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
       if (lastSaleEntry) {
         updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+        // chartPrice = {
+        //   price: lastSaleEntry.history[0].price,
+        //   date: new Date(), // Use the provided date or the current date
+        // };
+        // updateObj.$push = {
+        //   chartPrice: {
+        //     $each: [chartPrice],
+        //     $sort: { date: -1 }, // Sort in descending order based on bidTime
+        //   },
+        // };
+
       }
     }
 
@@ -557,6 +587,16 @@ router.patch("/update-nft", userAuthorization, async (req, res) => {
       console.log(lastBidEntry, "lastBidEntrylastBidEntrylastBidEntry",lastBidEntry.bidInfo[0].bidPrice);
       if (lastBidEntry) {
         updateObj.$set.nftPrice = lastBidEntry.bidInfo[0].bidPrice;
+        // chartPrice = {
+        //   price: lastBidEntry.bidInfo[0].bidPrice,
+        //   date: new Date(), // Use the provided date or the current date
+        // };
+        // updateObj.$push = {
+        //   chartPrice: {
+        //     $each: [chartPrice],
+        //     $sort: { date: -1 }, // Sort in descending order based on bidTime
+        //   },
+        // };
       }
     }
 
@@ -672,7 +712,9 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
       history?.category == "mint" ||
       history?.category == "cancelAuction" ||
       history?.category == "closeSale" ||
-      history?.category == "cancelBid"
+      history?.category == "cancelBid" ||
+      history?.category == "gift"
+
     ) {
       newHistoryEntry = {
         owner: history.owner,
@@ -681,6 +723,20 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
         date: new Date(), // Use the provided date or the current date
       };
     }
+
+    // if (
+    //   history?.category == "bid" ||
+    //   history?.category == "buy" ||
+    //   history?.category == "sale" ||
+    //   history?.category == "transfer" ||
+    //   history?.category == "auction" ||
+    //   history?.category == "mint"
+    // ) {
+    //   chartPrice = {
+    //     price: history.price,
+    //     date: new Date(), // Use the provided date or the current date
+    //   };
+    // }
 
     let newBidObj = null;
     if (onAuction) {
@@ -735,6 +791,10 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
           $each: [newHistoryEntry],
           $sort: { date: -1 }, // Sort in descending order based on bidTime
         },
+        // chartPrice: {
+        //   $each: [chartPrice],
+        //   $sort: { date: -1 }, // Sort in descending order based on bidTime
+        // },
       };
     }
 
@@ -754,6 +814,16 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
       console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
       if (lastSaleEntry) {
         updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+        // chartPrice = {
+        //   price: lastSaleEntry.history[0].price,
+        //   date: new Date(), // Use the provided date or the current date
+        // };
+        // updateObj.$push = {
+        //   chartPrice: {
+        //     $each: [chartPrice],
+        //     $sort: { date: -1 }, // Sort in descending order based on bidTime
+        //   },
+        // };
       }
     }
     if(history.category == "cancelBid"){
@@ -765,6 +835,17 @@ router.patch("/update-nft-gift", userAuthorization, async (req, res) => {
       console.log(lastBidEntry, "lastBidEntrylastBidEntrylastBidEntry",lastBidEntry.bidInfo[0].bidPrice);
       if (lastBidEntry) {
         updateObj.$set.nftPrice = lastBidEntry.bidInfo[0].bidPrice;
+        // chartPrice = {
+        //   price: lastBidEntry.bidInfo[0].bidPrice,
+        //   date: new Date(), // Use the provided date or the current date
+        // };
+        // updateObj.$push = {
+        //   chartPrice: {
+        //     $each: [chartPrice],
+        //     $sort: { date: -1 }, // Sort in descending order based on bidTime
+        //   },
+        // };
+        
       }
     }
 
