@@ -95,7 +95,7 @@ const NftSchema = new Schema({
         },
         category: {
             type: String,
-            enum: ["mint", "bid", "buy", "transfer","auction","sale","cancelAuction","closeSale","cancelBid","gift"],
+            enum: ["mint", "bid", "buy", "transfer","auction","sale","cancelAuction","closeSale","cancelBid","gift","originalPrice"],
         }
     }],
     chartPrice: [{

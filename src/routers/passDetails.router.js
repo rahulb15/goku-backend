@@ -286,6 +286,19 @@ router.patch("/updatePass", userAuthorization, async (req, res) => {
       console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
       if (lastSaleEntry) {
         updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+              //add originalPrice in History
+              newHistoryEntry = {
+                owner: history.owner,
+                price: lastSaleEntry.history[0].price,
+                category: "originalPrice",
+                date: new Date(), // Use the provided date or the current date
+              };
+              updateObj.$push = {
+                history: {
+                  $each: [newHistoryEntry],
+                  $sort: { date: -1 }, // Sort in descending order based on bidTime
+                },
+              };
         // chartPrice = {
         //   price: lastSaleEntry.history[0].price,
         //   date: new Date(), // Use the provided date or the current date
@@ -500,6 +513,19 @@ router.patch("/update-nft-pass-gift", userAuthorization, async (req, res) => {
       console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
       if (lastSaleEntry) {
         updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+        newHistoryEntry = {
+          owner: history.owner,
+          price: lastSaleEntry.history[0].price,
+          category: "originalPrice",
+          date: new Date(), // Use the provided date or the current date
+        };
+        updateObj.$push = {
+          history: {
+            $each: [newHistoryEntry],
+            $sort: { date: -1 }, // Sort in descending order based on bidTime
+          },
+        };
+
         // chartPrice = {
         //   price: lastSaleEntry.history[0].price,
         //   date: new Date(), // Use the provided date or the current date
@@ -752,6 +778,18 @@ router.patch("/update-nft-pass", userAuthorization, async (req, res) => {
       console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
       if (lastSaleEntry) {
         updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+        newHistoryEntry = {
+          owner: history.owner,
+          price: lastSaleEntry.history[0].price,
+          category: "originalPrice",
+          date: new Date(), // Use the provided date or the current date
+        };
+        updateObj.$push = {
+          history: {
+            $each: [newHistoryEntry],
+            $sort: { date: -1 }, // Sort in descending order based on bidTime
+          },
+        };
         // chartPrice = {
         //   price: lastSaleEntry.history[0].price,
         //   date: new Date(), // Use the provided date or the current date
@@ -963,6 +1001,18 @@ router.patch("/bidding", userAuthorization, async (req, res) => {
       console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
       if (lastSaleEntry) {
         updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+        newHistoryEntry = {
+          owner: history.owner,
+          price: lastSaleEntry.history[0].price,
+          category: "originalPrice",
+          date: new Date(), // Use the provided date or the current date
+        };
+        updateObj.$push = {
+          history: {
+            $each: [newHistoryEntry],
+            $sort: { date: -1 }, // Sort in descending order based on bidTime
+          },
+        };
         // chartPrice = {
         //   price: lastSaleEntry.history[0].price,
         //   date: new Date(), // Use the provided date or the current date
@@ -1157,6 +1207,18 @@ router.patch("/bidding-pass", userAuthorization, async (req, res) => {
       console.log(lastSaleEntry, "lastSaleEntrylastSaleEntrylastSaleEntry",lastSaleEntry.history[0].price);
       if (lastSaleEntry) {
         updateObj.$set.nftPrice = lastSaleEntry.history[0].price;
+        newHistoryEntry = {
+          owner: history.owner,
+          price: lastSaleEntry.history[0].price,
+          category: "originalPrice",
+          date: new Date(), // Use the provided date or the current date
+        };
+        updateObj.$push = {
+          history: {
+            $each: [newHistoryEntry],
+            $sort: { date: -1 }, // Sort in descending order based on bidTime
+          },
+        };
         // chartPrice = {
         //   price: lastSaleEntry.history[0].price,
         //   date: new Date(), // Use the provided date or the current date
